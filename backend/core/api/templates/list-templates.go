@@ -1,11 +1,10 @@
 package templates
 
 import (
+	"github.com/gin-gonic/gin"
 	"kak-to/models"
 	"kak-to/db"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 func ListTemplates(c *gin.Context) {

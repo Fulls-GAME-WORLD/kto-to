@@ -1,14 +1,19 @@
 package templates
 
 import (
+	"github.com/gin-gonic/gin"
 	"kak-to/models"
 	"kak-to/db"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 func CloneTemplate(c *gin.Context) {
+	userUUID, exists := c.Get("userUUID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authorized"})
+		return
+	}
+
 	id := c.Param("id")
 
 	var template models.PosterTemplate
@@ -18,11 +23,12 @@ func CloneTemplate(c *gin.Context) {
 	}
 
 	poster := models.Poster{
-		Name:   template.Name + " (copy)",
-		Format: template.Format,
-		Scene:  template.Scene,
-		Width:  794,
-		Height: 1123,
+		UserUUID: userUUID.(string),
+		Name:     template.Name + " (copy)",
+		Format:   template.Format,
+		Scene:    template.Scene,
+		Width:    794,
+		Height:   1123,
 	}
 
 	if err := db.DB.Create(&poster).Error; err != nil {
