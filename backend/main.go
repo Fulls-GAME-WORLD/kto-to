@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"kak-to/core/api/templates"
 	"github.com/gin-gonic/gin"
 	"kak-to/core/routers"
@@ -25,6 +26,7 @@ func main() {
 	log.SetOutput(f)
 	gin.DefaultWriter = io.MultiWriter(f)
 	app := gin.Default()
+	app.Use(cors.New(configs.CorsConfig()))
 
 	routers.PosterRouters(app)
 	fmt.Println("Poster Service is running on port", "http://localhost"+configs.GetAppPort())
