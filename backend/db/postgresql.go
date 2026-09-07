@@ -1,8 +1,8 @@
 package db
 
 import (
-	"kak-to/models"
 	"gorm.io/driver/postgres"
+	"kak-to/models"
 	"gorm.io/gorm"
 	"log"
 )
@@ -17,6 +17,7 @@ func InitDB(dsn string) error {
 	}
 
 	err = DB.AutoMigrate(
+		&models.User{},
 		&models.Poster{},
 		&models.PosterAsset{},
 		&models.PosterTemplate{},
