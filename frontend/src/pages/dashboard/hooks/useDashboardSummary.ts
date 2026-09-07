@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
-import { getProfileInfo } from "../../libs/profile/profile-info.ts"
-import { listPosters } from "../../libs/posters/posters.ts"
-import { listAssets } from "../../libs/assets/assets.ts"
-import { listTemplates } from "../../libs/templates/templates.ts"
+import { getProfileInfo } from "../../../libs/profile/profile-info.ts"
+import { listPosters } from "../../../libs/posters/posters.ts"
+import { listAssets } from "../../../libs/assets/assets.ts"
+import { listTemplates } from "../../../libs/templates/templates.ts"
 
 interface DashboardSummary {
   userName: string

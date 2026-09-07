@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import TextConfig from "../../../libs/configs/site/text.configs.ts"
+import TextConfig from "../../../../libs/configs/site/text.configs.ts"
 
 interface EditorErrorAlertProps {
   message: string

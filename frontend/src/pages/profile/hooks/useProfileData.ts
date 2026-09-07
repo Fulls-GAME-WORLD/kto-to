@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getProfileInfo, type ProfileInfo } from "../../libs/profile/profile-info.ts"
+import { getProfileInfo, type ProfileInfo } from "../../../libs/profile/profile-info.ts"
 
 interface ProfileDataState {
   profile: ProfileInfo | null

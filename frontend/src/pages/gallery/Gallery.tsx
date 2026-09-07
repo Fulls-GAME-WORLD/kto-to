@@ -20,6 +20,7 @@ function Gallery() {
         </div>
       </main>
     </>
+  )
 }
 
 export default Gallery

@@ -51,6 +51,7 @@ function Register() {
         </div>
       </main>
     </>
+  )
 }
 
 export default Register
