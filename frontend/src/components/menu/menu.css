@@ -1,5 +1,10 @@
 .main-menu {
-    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    background-color: var(--bg-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .menu-inner {
@@ -14,7 +19,7 @@
 .menu-logo {
     font-weight: 700;
     text-decoration: none;
-    color: inherit;
+    color: var(--fg-color);
 }
 
 .menu-nav {
@@ -25,11 +30,15 @@
 
 .menu-link {
     text-decoration: none;
-    color: inherit;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.menu-link:hover {
+    color: var(--fg-color);
 }
 
 .menu-link.active {
-    font-weight: 700;
+    color: var(--fg-color);
 }
 
 .menu-link-button {
@@ -37,4 +46,12 @@
     border: none;
     cursor: pointer;
     font-size: inherit;
+    color: rgba(255, 255, 255, 0.65);
+    padding: 0;
+    border-radius: 0;
+}
+
+.menu-link-button:hover {
+    background: none;
+    color: var(--fg-color);
 }

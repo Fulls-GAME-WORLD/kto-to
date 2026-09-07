@@ -6,11 +6,16 @@
 
 .form-item-email label {
     font-size: 14px;
+    color: var(--login-text-input-color);
 }
 
 .form-item-email input {
     padding: 10px 12px;
     font-size: 16px;
+    background: var(--form-input-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+    color: var(--fg-color);
 }
 
 .form-item-password {
@@ -21,11 +26,16 @@
 
 .form-item-password label {
     font-size: 14px;
+    color: var(--login-text-input-color);
 }
 
 .form-item-password input {
     padding: 10px 12px;
     font-size: 16px;
+    background: var(--form-input-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+    color: var(--fg-color);
 }
 
 .form-item-name {
@@ -36,9 +46,14 @@
 
 .form-item-name label {
     font-size: 14px;
+    color: var(--login-text-input-color);
 }
 
 .form-item-name input {
     padding: 10px 12px;
     font-size: 16px;
+    background: var(--form-input-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+    color: var(--fg-color);
 }

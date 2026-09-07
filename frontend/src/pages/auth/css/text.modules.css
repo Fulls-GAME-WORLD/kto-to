@@ -1,7 +1,8 @@
 .auth-title {
     margin: 0 0 8px;
+    color: var(--login-text-color);
 }
 
 .auth-error {
-    color: #c0392b;
+    color: var(--alerts-error-color);
 }
