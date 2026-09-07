@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"kak-to/api/templates"
-	"kak-to/api/routers"
+	"kak-to/core/routers"
 	"kak-to/configs"
 	"kak-to/db"
 	"fmt"
