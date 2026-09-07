@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"kak-to/utils/middleware"
 	"kak-to/core/api/posters"
+	"kak-to/core/api/profile"
 	"kak-to/core/api/assets"
 	"kak-to/core/api/auth"
 )
@@ -25,15 +26,15 @@ func PosterRouters(app *gin.Engine) {
 	{
 		testrouters(v1)
 
-		v1.POST("/start/register", auth.Register)
-		v1.POST("/start/login", auth.Login)
+		v1.POST("/start/auth/login/in/my/account", auth.AuthLogins)
+		v1.POST("/start/auth/register/my/new/account", auth.AuthRegisters)
 		v1.GET("/get/templates", templates.ListTemplates)
 	}
 
 	protected := app.Group("/api/v1/main/poster/backend/service")
 	protected.Use(middleware.AuthMiddleware())
 	{
-		protected.GET("/get/my/profile", auth.My)
+		protected.GET("/get/profile/info", profile.ProfileInfo)
 		protected.POST("/create/poster", posters.CreatePoster)
 		protected.GET("/get/posters", posters.ListPosters)
 		protected.GET("/get/poster/:id", posters.GetPoster)

@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func Register(c *gin.Context) {
+func AuthRegisters(c *gin.Context) {
 	var input struct {
 		Name     string `json:"name" binding:"required"`
 		Email    string `json:"email" binding:"required,email"`

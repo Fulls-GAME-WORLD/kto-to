@@ -4,9 +4,9 @@ export const API_CONFIG = {
     HELLO: "/",
   },
   AUTH_ENDPOINTS: {
-    REGISTER: "/start/register",
-    LOGIN: "/start/login",
-    MY_PROFILE: "/get/my/profile",
+    REGISTER: "/start/auth/register/my/new/account",
+    LOGIN: "/start/auth/login/in/my/account",
+    MY_PROFILE: "/get/profile/info",
   },
   POSTER_ENDPOINTS: {
     CREATE: "/create/poster",

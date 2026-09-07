@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func Login(c *gin.Context) {
+func AuthLogins(c *gin.Context) {
 	var input struct {
 		Email    string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required"`

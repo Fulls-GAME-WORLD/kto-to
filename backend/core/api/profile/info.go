@@ -1,4 +1,4 @@
-package auth
+package profile
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func My(c *gin.Context) {
+func ProfileInfo(c *gin.Context) {
 	userUUID, exists := c.Get("userUUID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authorized"})
@@ -20,5 +20,11 @@ func My(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{
+		"name": user.Name,
+		"email": user.Email,
+		"uuid": user.UUID,
+		"created_at": user.CreatedAt,
+		"updated_at": user.UpdatedAt,
+	})
 }
