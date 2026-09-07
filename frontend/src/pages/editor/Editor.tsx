@@ -13,6 +13,7 @@ import PosterPropsPanel from "./components/props/PosterPropsPanel.tsx"
 import PosterLayersPanel from "./components/layers/PosterLayersPanel.tsx"
 import EditorLoadingState from "./components/States/EditorLoadingState.tsx"
 import EditorErrorAlert from "./components/States/EditorErrorAlert.tsx"
+import HtmlImportModal from "./components/modal/HtmlImportModal.tsx"
 
 import "./css/editor.modules.css"
 
@@ -27,6 +28,7 @@ function Editor() {
   const [saveLabel, setSaveLabel] = useState(TextConfig.saved)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const saveTimer = useRef<number | null>(null)
 
   useEffect(() => {
@@ -146,6 +148,12 @@ function Editor() {
     void exportSceneToPng(stageDoc, stageWidth, stageHeight, `${posterName || "poster"}.png`)
   }
 
+  function handleApplyHtmlImport(newDoc: SceneDoc, newWidth?: number, newHeight?: number) {
+    if (newWidth) setStageWidth(newWidth)
+    if (newHeight) setStageHeight(newHeight)
+    applyDoc(newDoc)
+  }
+
   const selectedBlock = stageDoc.blocks.find((block) => block.id === selectedBlockId) ?? null
 
   return (
@@ -168,6 +176,7 @@ function Editor() {
                 onAddRectBlock={() => handleAddBlock("rect")}
                 onAddCircleBlock={() => handleAddBlock("circle")}
                 onUploadImageFile={(file) => void handleUploadImageFile(file)}
+                onOpenHtmlImport={() => setIsImportModalOpen(true)}
                 onPrintPoster={handlePrintPoster}
                 onExportPosterPng={handleExportPosterPng}
               />
@@ -203,6 +212,15 @@ function Editor() {
           )}
         </div>
       </main>
+
+      <HtmlImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        currentDoc={stageDoc}
+        stageWidth={stageWidth}
+        stageHeight={stageHeight}
+        onApplyImport={handleApplyHtmlImport}
+      />
     </>
   )
 }

@@ -63,5 +63,18 @@
     "deleteBlock": "Удалить блок",
     "posterNameLabel": "Название",
     "backToGallery": "Назад в галерею",
-    "saveError": "Ошибка сохранения"
+    "saveError": "Ошибка сохранения",
+    "importHtml": "Импорт HTML",
+    "importBadge": "Figma Style",
+    "importHtmlTitle": "Импорт из HTML в дизайн",
+    "importTabCode": "Вставить код",
+    "importTabFile": "Загрузить файл",
+    "htmlSnippetLabel": "HTML & CSS разметка",
+    "loadSample": "Загрузить пример",
+    "dropzoneHint": "Перетащите .html файл сюда",
+    "dropzoneOrBrowse": "или нажмите, чтобы выбрать файл",
+    "importReplaceBlocks": "Заменить текущие блоки на холсте",
+    "importResizeCanvas": "Подогнать размеры холста под макет",
+    "cancelBtn": "Отмена",
+    "importBtn": "Импортировать в холст"
 }

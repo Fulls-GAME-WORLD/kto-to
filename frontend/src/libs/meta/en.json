@@ -63,5 +63,18 @@
     "deleteBlock": "Delete block",
     "posterNameLabel": "Poster name",
     "backToGallery": "Back to gallery",
-    "saveError": "Save error"
+    "saveError": "Save error",
+    "importHtml": "Import HTML",
+    "importBadge": "Figma Style",
+    "importHtmlTitle": "Import HTML to Design",
+    "importTabCode": "Paste Code",
+    "importTabFile": "Upload File",
+    "htmlSnippetLabel": "HTML & CSS markup",
+    "loadSample": "Load Sample",
+    "dropzoneHint": "Drag & drop .html file here",
+    "dropzoneOrBrowse": "or click to browse",
+    "importReplaceBlocks": "Replace existing blocks on canvas",
+    "importResizeCanvas": "Resize canvas to fit imported layout",
+    "cancelBtn": "Cancel",
+    "importBtn": "Import to Canvas"
 }

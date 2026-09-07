@@ -71,6 +71,19 @@ function TextConfig() {
         backToGallery: langDict.backToGallery,
         saveError: langDict.saveError,
         loading: langDict.loading,
+        importHtml: langDict.importHtml,
+        importBadge: langDict.importBadge,
+        importHtmlTitle: langDict.importHtmlTitle,
+        importTabCode: langDict.importTabCode,
+        importTabFile: langDict.importTabFile,
+        htmlSnippetLabel: langDict.htmlSnippetLabel,
+        loadSample: langDict.loadSample,
+        dropzoneHint: langDict.dropzoneHint,
+        dropzoneOrBrowse: langDict.dropzoneOrBrowse,
+        importReplaceBlocks: langDict.importReplaceBlocks,
+        importResizeCanvas: langDict.importResizeCanvas,
+        cancelBtn: langDict.cancelBtn,
+        importBtn: langDict.importBtn,
     }
 }
 export default TextConfig()

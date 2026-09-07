@@ -7,11 +7,20 @@ interface PosterToolbarProps {
   onAddRectBlock: () => void
   onAddCircleBlock: () => void
   onUploadImageFile: (file: File) => void
+  onOpenHtmlImport: () => void
   onPrintPoster: () => void
   onExportPosterPng: () => void
 }
 
-function PosterToolbar({ onAddTextBlock, onAddRectBlock, onAddCircleBlock, onUploadImageFile, onPrintPoster, onExportPosterPng }: PosterToolbarProps) {
+function PosterToolbar({
+  onAddTextBlock,
+  onAddRectBlock,
+  onAddCircleBlock,
+  onUploadImageFile,
+  onOpenHtmlImport,
+  onPrintPoster,
+  onExportPosterPng,
+}: PosterToolbarProps) {
   const fileInput = useRef<HTMLInputElement>(null)
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -29,6 +38,9 @@ function PosterToolbar({ onAddTextBlock, onAddRectBlock, onAddCircleBlock, onUpl
       <button onClick={onAddCircleBlock}>{TextConfig.addCircle}</button>
       <button onClick={() => fileInput.current?.click()}>{TextConfig.uploadImage}</button>
       <input ref={fileInput} type="file" accept="image/*" hidden onChange={handleFileChange} />
+      <button className="btn-import-html" onClick={onOpenHtmlImport}>
+        <span className="btn-icon">⚡</span> {TextConfig.importHtml}
+      </button>
       <button onClick={onPrintPoster}>{TextConfig.print}</button>
       <button onClick={onExportPosterPng}>{TextConfig.exportPng}</button>
     </div>
