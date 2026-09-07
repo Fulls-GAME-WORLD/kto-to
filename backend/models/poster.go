@@ -4,6 +4,7 @@ import "time"
 
 type Poster struct {
 	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserUUID  string    `gorm:"index;not null" json:"-"`
 	Name      string    `gorm:"size:255;not null" json:"name"`
 	Format    string    `gorm:"size:64;not null;default:'A4'" json:"format"`
 	Width     int       `gorm:"not null" json:"width"`

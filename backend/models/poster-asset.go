@@ -4,6 +4,7 @@ import "time"
 
 type PosterAsset struct {
 	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserUUID  string    `gorm:"index;not null" json:"-"`
 	Filename  string    `gorm:"size:255;not null" json:"filename"`
 	URL       string    `gorm:"size:512;not null" json:"url"`
 	Mime      string    `gorm:"size:128" json:"mime"`
