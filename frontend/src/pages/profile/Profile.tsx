@@ -3,7 +3,6 @@ import { useProfileData } from "./hooks/useProfileData.ts"
 import ProfileLoadingState from "./components/States/ProfileLoadingState.tsx"
 import ProfileErrorAlert from "./components/States/ProfileErrorAlert.tsx"
 import ProfileInfoCard from "./components/info/ProfileInfoCard.tsx"
-import ProfileLogoutButton from "./components/buttons/ProfileLogoutButton.tsx"
 
 import "./css/profile.modules.css"
 
@@ -20,7 +19,6 @@ function Profile() {
           {!loading && profile && (
             <>
               <ProfileInfoCard profile={profile} />
-              <ProfileLogoutButton />
             </>
           )}
         </div>

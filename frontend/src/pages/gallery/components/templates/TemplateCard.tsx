@@ -9,9 +9,16 @@ interface TemplateCardProps {
 function TemplateCard({ template, onUseTemplate }: TemplateCardProps) {
   return (
     <article className="poster-card">
-      <h3>{template.name}</h3>
-      <p>{template.format}</p>
-      <button onClick={onUseTemplate}>{TextConfig.clone}</button>
+      <div className="poster-card-preview">
+        <span className="poster-card-format">{template.format}</span>
+      </div>
+      <div className="poster-card-body">
+        <h3>{template.name}</h3>
+        <p>{template.format}</p>
+        <div className="poster-card-actions">
+          <button onClick={onUseTemplate}>{TextConfig.clone}</button>
+        </div>
+      </div>
     </article>
   )
 }

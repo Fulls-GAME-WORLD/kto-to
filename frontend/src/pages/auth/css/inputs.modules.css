@@ -1,59 +1,134 @@
 .form-item-email {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
 }
 
 .form-item-email label {
-    font-size: 14px;
-    color: var(--login-text-input-color);
+    color: var(--text-secondary);
+    font-family: var(--main-font);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .form-item-email input {
-    padding: 10px 12px;
-    font-size: 16px;
     background: var(--form-input-bg);
     border: 1px solid var(--form-border);
-    border-radius: 8px;
-    color: var(--fg-color);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    color: var(--text-primary);
+    font-family: var(--main-font);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: all var(--transition);
+    width: 100%;
+}
+
+.form-item-email input::placeholder {
+    color: var(--text-dim);
+}
+
+.form-item-email input:hover {
+    border-color: var(--form-border-strong);
+    background: var(--form-input-bg-focus);
+}
+
+.form-item-email input:focus {
+    border-color: var(--accent-border);
+    background: var(--form-input-bg-focus);
+    box-shadow: var(--shadow-focus);
 }
 
 .form-item-password {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
 }
 
 .form-item-password label {
-    font-size: 14px;
-    color: var(--login-text-input-color);
+    color: var(--text-secondary);
+    font-family: var(--main-font);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .form-item-password input {
-    padding: 10px 12px;
-    font-size: 16px;
     background: var(--form-input-bg);
     border: 1px solid var(--form-border);
-    border-radius: 8px;
-    color: var(--fg-color);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    color: var(--text-primary);
+    font-family: var(--main-font);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: all var(--transition);
+    width: 100%;
+}
+
+.form-item-password input::placeholder {
+    color: var(--text-dim);
+}
+
+.form-item-password input:hover {
+    border-color: var(--form-border-strong);
+    background: var(--form-input-bg-focus);
+}
+
+.form-item-password input:focus {
+    border-color: var(--accent-border);
+    background: var(--form-input-bg-focus);
+    box-shadow: var(--shadow-focus);
 }
 
 .form-item-name {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
 }
 
 .form-item-name label {
-    font-size: 14px;
-    color: var(--login-text-input-color);
+    color: var(--text-secondary);
+    font-family: var(--main-font);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .form-item-name input {
-    padding: 10px 12px;
-    font-size: 16px;
     background: var(--form-input-bg);
     border: 1px solid var(--form-border);
-    border-radius: 8px;
-    color: var(--fg-color);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    color: var(--text-primary);
+    font-family: var(--main-font);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: all var(--transition);
+    width: 100%;
+}
+
+.form-item-name input::placeholder {
+    color: var(--text-dim);
+}
+
+.form-item-name input:hover {
+    border-color: var(--form-border-strong);
+    background: var(--form-input-bg-focus);
+}
+
+.form-item-name input:focus {
+    border-color: var(--accent-border);
+    background: var(--form-input-bg-focus);
+    box-shadow: var(--shadow-focus);
 }

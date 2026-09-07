@@ -164,7 +164,7 @@ function Editor() {
           {loading && <EditorLoadingState />}
           {!loading && error !== "" && <EditorErrorAlert message={error} />}
           {!loading && error === "" && (
-            <>
+            <div className="editor-shell">
               <PosterTopbar
                 posterName={posterName}
                 posterFormat={posterFormat}
@@ -179,7 +179,8 @@ function Editor() {
                 onPrintPoster={handlePrintPoster}
                 onExportPosterPng={handleExportPosterPng}
               />
-              <div className="editor-layout">
+              <div className="editor-main">
+                <div className="editor-canvas-wrap">
                 <PosterStage
                   stageDoc={stageDoc}
                   stageWidth={stageWidth}
@@ -188,24 +189,25 @@ function Editor() {
                   onSelectBlock={setSelectedBlockId}
                   onMoveBlock={handleMoveBlock}
                 />
-                <div className="editor-side">
-                  <PosterPropsPanel
-                    stageDoc={stageDoc}
-                    selectedBlock={selectedBlock}
-                    onCanvasBgChange={(bg) => applyDoc({ ...stageDoc, bg })}
-                    onBlockPatch={handleBlockPatch}
-                  />
-                  <PosterLayersPanel
-                    stageBlocks={stageDoc.blocks}
-                    selectedBlockId={selectedBlockId}
-                    onSelectBlock={setSelectedBlockId}
-                    onMoveBlockUp={handleMoveBlockUp}
-                    onMoveBlockDown={handleMoveBlockDown}
-                    onDeleteBlock={handleDeleteBlock}
-                  />
-                </div>
               </div>
-            </>
+              <div className="editor-side">
+                <PosterPropsPanel
+                  stageDoc={stageDoc}
+                  selectedBlock={selectedBlock}
+                  onCanvasBgChange={(bg) => applyDoc({ ...stageDoc, bg })}
+                  onBlockPatch={handleBlockPatch}
+                />
+                <PosterLayersPanel
+                  stageBlocks={stageDoc.blocks}
+                  selectedBlockId={selectedBlockId}
+                  onSelectBlock={setSelectedBlockId}
+                  onMoveBlockUp={handleMoveBlockUp}
+                  onMoveBlockDown={handleMoveBlockDown}
+                  onDeleteBlock={handleDeleteBlock}
+                />
+              </div>
+            </div>
+            </div>
           )}
         </div>
       </main>

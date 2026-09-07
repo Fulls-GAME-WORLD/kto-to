@@ -1,14 +1,53 @@
 .buttons-auth {
     display: flex;
     gap: 12px;
+    margin-top: 4px;
 }
 
-.buttons-auth button {
-    padding: 10px 20px;
-    font-size: 16px;
+.buttons-auth button[type="submit"] {
+    width: 100%;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-color);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+    color: #0e0e10;
+    font-family: var(--main-font);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     cursor: pointer;
+    transition: all var(--transition);
+}
+
+.buttons-auth button[type="submit"]:hover {
+    background: var(--accent-secondary);
+    box-shadow: var(--accent-glow);
+    transform: translateY(-1px);
+}
+
+.buttons-auth button[type="submit"]:active {
+    transform: translateY(0);
 }
 
 .auth-switch {
-    margin-top: 8px;
+    margin-top: 4px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.auth-switch a {
+    color: var(--text-muted);
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+}
+
+.auth-switch a:hover {
+    color: var(--text-primary);
+    border-color: var(--form-border-strong);
 }

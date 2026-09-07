@@ -3,55 +3,111 @@
     top: 0;
     z-index: 100;
     width: 100%;
-    background-color: var(--bg-color);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(14, 14, 16, 0.82);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .menu-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 1100px;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 12px 16px;
+    padding: 0 24px;
+    height: 64px;
+    gap: 24px;
 }
 
 .menu-logo {
-    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
     text-decoration: none;
-    color: var(--fg-color);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.menu-logo:hover {
+    color: var(--text-primary);
 }
 
 .menu-nav {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 4px;
 }
 
 .menu-link {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-family: var(--main-font);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.65);
+    transition: all var(--transition);
+    border: 1px solid transparent;
 }
 
 .menu-link:hover {
-    color: var(--fg-color);
+    color: var(--text-primary);
+    background: var(--form-bg);
+    border-color: var(--form-border);
 }
 
 .menu-link.active {
-    color: var(--fg-color);
+    color: var(--text-primary);
+    background: var(--form-bg);
+    border-color: var(--form-border);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
 }
 
 .menu-link-button {
-    background: none;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid transparent;
+    font-family: var(--main-font);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
     cursor: pointer;
-    font-size: inherit;
-    color: rgba(255, 255, 255, 0.65);
-    padding: 0;
-    border-radius: 0;
+    transition: all var(--transition);
 }
 
 .menu-link-button:hover {
-    background: none;
-    color: var(--fg-color);
+    background: var(--form-bg);
+    border-color: var(--form-border);
+    color: var(--text-primary);
+    box-shadow: none;
+    transform: none;
+}
+
+@media (max-width: 640px) {
+    .menu-inner {
+        padding: 0 16px;
+        height: 56px;
+    }
+
+    .menu-nav {
+        gap: 2px;
+    }
+
+    .menu-link {
+        padding: 0 10px;
+        font-size: 13px;
+        height: 32px;
+    }
 }

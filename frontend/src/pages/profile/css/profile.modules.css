@@ -1,14 +1,99 @@
-.profile-card {
-    border: 1px solid var(--form-border);
+.profile-hero {
+    display: flex;
+    gap: 20px;
+    align-items: center;
     background: var(--form-bg);
-    border-radius: 8px;
+    border: 1px solid var(--form-border);
+    border-radius: var(--radius-xl);
     padding: 24px;
-    max-width: 480px;
+    box-shadow: var(--shadow-card);
+    max-width: 560px;
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-color);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.profile-meta h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.profile-meta p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.profile-card {
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--form-border);
+}
+
+.profile-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.profile-row span:first-child {
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.profile-row span:last-child {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-all;
 }
 
 .profile-error {
-    border: 1px solid var(--alerts-error-color);
-    border-radius: 8px;
+    background: var(--alerts-error-bg);
+    border: 1px solid var(--alerts-error-border);
+    border-radius: var(--radius-lg);
     padding: 16px;
-    max-width: 480px;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile-skeleton {
+    max-width: 560px;
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }
