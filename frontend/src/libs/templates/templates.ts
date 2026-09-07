@@ -1,5 +1,5 @@
 import { API_CONFIG } from "../configs/api/config/apiConfig.ts"
-import { authHeaders } from "../auth/auth.ts"
+import { authHeaders } from "../auth/session.ts"
 import type { Poster } from "../posters/posters.ts"
 
 export interface PosterTemplate {

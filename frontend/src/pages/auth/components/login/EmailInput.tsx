@@ -1,16 +1,16 @@
-import TextConfig from "../../../libs/configs/site/text.configs.ts"
+import TextConfig from "../../../../libs/configs/site/text.configs.ts"
 
-interface EmailInputProps {
+interface LoginEmailProps {
   value: string
   onChange: (value: string) => void
 }
 
-function EmailInput({ value, onChange }: EmailInputProps) {
+function LoginEmail({ value, onChange }: LoginEmailProps) {
   return (
     <div className="form-item-email">
-      <label htmlFor="email">{TextConfig.email}</label>
+      <label htmlFor="login-email">{TextConfig.email}</label>
       <input
-        id="email"
+        id="login-email"
         type="email"
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -21,4 +21,4 @@ function EmailInput({ value, onChange }: EmailInputProps) {
   )
 }
 
-export default EmailInput
+export default LoginEmail

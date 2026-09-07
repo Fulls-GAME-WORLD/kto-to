@@ -1,16 +1,16 @@
-import TextConfig from "../../../libs/configs/site/text.configs.ts"
+import TextConfig from "../../../../libs/configs/site/text.configs.ts"
 
-interface NameInputProps {
+interface RegisterNameProps {
   value: string
   onChange: (value: string) => void
 }
 
-function NameInput({ value, onChange }: NameInputProps) {
+function RegisterName({ value, onChange }: RegisterNameProps) {
   return (
     <div className="form-item-name">
-      <label htmlFor="name">{TextConfig.name}</label>
+      <label htmlFor="register-name">{TextConfig.name}</label>
       <input
-        id="name"
+        id="register-name"
         type="text"
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -21,4 +21,4 @@ function NameInput({ value, onChange }: NameInputProps) {
   )
 }
 
-export default NameInput
+export default RegisterName

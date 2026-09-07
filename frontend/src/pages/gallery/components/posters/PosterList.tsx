@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { listPosters, deletePoster, type Poster } from "../../libs/posters/posters.ts"
-import TextConfig from "../../libs/configs/site/text.configs.ts"
+import { listPosters, deletePoster, type Poster } from "../../../../libs/posters/posters.ts"
+import TextConfig from "../../../../libs/configs/site/text.configs.ts"
 import PosterCard from "./PosterCard.tsx"
 
 function PosterList() {
@@ -16,9 +16,9 @@ function PosterList() {
       .finally(() => setLoading(false))
   }, [])
 
-  async function remove(id: number) {
+  async function removePosterById(id: number) {
     await deletePoster(id)
-    setPosters((prev) => prev.filter((p) => p.id !== id))
+    setPosters((prev) => prev.filter((poster) => poster.id !== id))
   }
 
   if (loading) {
@@ -33,8 +33,8 @@ function PosterList() {
           <PosterCard
             key={poster.id}
             poster={poster}
-            onOpen={() => navigate(`/editor/${poster.id}`)}
-            onRemove={() => remove(poster.id)}
+            onOpenPoster={() => navigate(`/my/poster/${poster.id}`)}
+            onRemovePoster={() => removePosterById(poster.id)}
           />
         ))}
       </div>

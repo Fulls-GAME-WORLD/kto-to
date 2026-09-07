@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { listTemplates, cloneTemplate, type PosterTemplate } from "../../libs/templates/templates.ts"
-import TextConfig from "../../libs/configs/site/text.configs.ts"
+import { listTemplates, cloneTemplate, type PosterTemplate } from "../../../../libs/templates/templates.ts"
+import TextConfig from "../../../../libs/configs/site/text.configs.ts"
 import TemplateCard from "./TemplateCard.tsx"
 
 function TemplateList() {
@@ -14,17 +14,17 @@ function TemplateList() {
       .catch(() => setTemplates([]))
   }, [])
 
-  async function use(id: number) {
+  async function cloneTemplateById(id: number) {
     const poster = await cloneTemplate(id)
-    navigate(`/editor/${poster.id}`)
+    navigate(`/my/poster/${poster.id}`)
   }
 
   return (
     <section className="template-list">
       <h2>{TextConfig.templates}</h2>
       <div className="poster-grid">
-        {templates.map((tpl) => (
-          <TemplateCard key={tpl.id} template={tpl} onUse={() => use(tpl.id)} />
+        {templates.map((template) => (
+          <TemplateCard key={template.id} template={template} onUseTemplate={() => cloneTemplateById(template.id)} />
         ))}
       </div>
     </section>

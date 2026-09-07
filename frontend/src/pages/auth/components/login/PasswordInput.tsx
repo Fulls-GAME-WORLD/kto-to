@@ -1,16 +1,16 @@
-import TextConfig from "../../../libs/configs/site/text.configs.ts"
+import TextConfig from "../../../../libs/configs/site/text.configs.ts"
 
-interface PasswordInputProps {
+interface LoginPasswordProps {
   value: string
   onChange: (value: string) => void
 }
 
-function PasswordInput({ value, onChange }: PasswordInputProps) {
+function LoginPassword({ value, onChange }: LoginPasswordProps) {
   return (
     <div className="form-item-password">
-      <label htmlFor="password">{TextConfig.password}</label>
+      <label htmlFor="login-password">{TextConfig.password}</label>
       <input
-        id="password"
+        id="login-password"
         type="password"
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -21,4 +21,4 @@ function PasswordInput({ value, onChange }: PasswordInputProps) {
   )
 }
 
-export default PasswordInput
+export default LoginPassword

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom"
 
-interface AuthSwitchProps {
+interface AuthPageSwitchProps {
   to: string
   label: string
 }
 
-function AuthSwitch({ to, label }: AuthSwitchProps) {
+function AuthPageSwitch({ to, label }: AuthPageSwitchProps) {
   return (
     <div className="auth-switch">
       <Link to={to}>{label}</Link>
@@ -13,4 +13,4 @@ function AuthSwitch({ to, label }: AuthSwitchProps) {
   )
 }
 
-export default AuthSwitch
+export default AuthPageSwitch

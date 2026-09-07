@@ -1,5 +1,5 @@
 import { API_CONFIG } from "../configs/api/config/apiConfig.ts"
-import { authHeaders } from "../auth/auth.ts"
+import { authHeaders } from "../auth/session.ts"
 
 export interface Poster {
   id: number

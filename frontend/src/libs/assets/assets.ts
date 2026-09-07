@@ -1,5 +1,5 @@
 import { API_CONFIG } from "../configs/api/config/apiConfig.ts"
-import { authHeaders, getToken } from "../auth/auth.ts"
+import { authHeaders, getAuthToken } from "../auth/session.ts"
 
 export interface PosterAsset {
   id: number
@@ -23,7 +23,7 @@ export async function listAssets(): Promise<PosterAsset[]> {
 export async function uploadAsset(file: File): Promise<PosterAsset> {
   const form = new FormData()
   form.append("asset", file)
-  const token = getToken()
+  const token = getAuthToken()
   const res = await fetch(API_CONFIG.BASE_URL + API_CONFIG.ASSET_ENDPOINTS.UPLOAD, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
