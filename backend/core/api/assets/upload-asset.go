@@ -1,16 +1,15 @@
 package assets
 
 import (
-	"kak-to/models"
-	"kak-to/db"
-	"crypto/rand"
-	"encoding/hex"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
-
 	"github.com/gin-gonic/gin"
+	"kak-to/models"
+	"path/filepath"
+	"encoding/hex"
+	"crypto/rand"
+	"kak-to/db"
+	"net/http"
+	"strings"
+	"os"
 )
 
 const (
@@ -20,6 +19,12 @@ const (
 )
 
 func UploadAsset(c *gin.Context) {
+	userUUID, exists := c.Get("userUUID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authorized"})
+		return
+	}
+
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error preparing upload dir"})
 		return
@@ -62,6 +67,7 @@ func UploadAsset(c *gin.Context) {
 	}
 
 	asset := models.PosterAsset{
+		UserUUID: userUUID.(string),
 		Filename: file.Filename,
 		URL:      "/" + filePath,
 		Mime:     file.Header.Get("Content-Type"),

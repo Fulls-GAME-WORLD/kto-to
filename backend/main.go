@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"kak-to/core/api/templates"
+	"github.com/gin-gonic/gin"
 	"kak-to/core/routers"
 	"kak-to/configs"
 	"kak-to/db"
