@@ -13,7 +13,6 @@ function RegisterPassword({ value, onChange }: RegisterPasswordProps) {
         id="register-password"
         type="password"
         value={value}
-        minLength={8}
         onChange={(event) => onChange(event.target.value)}
         autoComplete="new-password"
         required
