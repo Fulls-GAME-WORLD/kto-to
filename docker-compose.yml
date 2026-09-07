@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15
+    container_name: kak_to_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kak_to
+    ports:
+      - "19930:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
