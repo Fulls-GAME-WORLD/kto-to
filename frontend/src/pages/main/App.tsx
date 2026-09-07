@@ -1,4 +1,4 @@
-import TextConfig from "../libs/configs/site/text.configs"
+import TextConfig from "../..//libs/configs/site/text.configs"
 
 function App() {
     return (

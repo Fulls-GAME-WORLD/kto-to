@@ -1,0 +1,44 @@
+.form-item-email {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-item-email label {
+    font-size: 14px;
+}
+
+.form-item-email input {
+    padding: 10px 12px;
+    font-size: 16px;
+}
+
+.form-item-password {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-item-password label {
+    font-size: 14px;
+}
+
+.form-item-password input {
+    padding: 10px 12px;
+    font-size: 16px;
+}
+
+.form-item-name {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-item-name label {
+    font-size: 14px;
+}
+
+.form-item-name input {
+    padding: 10px 12px;
+    font-size: 16px;
+}

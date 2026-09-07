@@ -1,5 +1,5 @@
-import { createPoster } from "../../../../libs/posters/posters.ts"
-import TextConfig from "../../../../libs/configs/site/text.configs.ts"
+import { createPoster } from "../../../../../libs/posters/posters.ts"
+import TextConfig from "../../../../../libs/configs/site/text.configs.ts"
 
 interface NewPosterButtonProps {
   onPosterCreated: (id: number) => void

@@ -1,0 +1,14 @@
+.buttons-auth {
+    display: flex;
+    gap: 12px;
+}
+
+.buttons-auth button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.auth-switch {
+    margin-top: 8px;
+}
