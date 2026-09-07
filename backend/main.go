@@ -2,18 +2,22 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"kak-to/api/templates"
+	"kak-to/api/routers"
 	"kak-to/configs"
+	"kak-to/db"
 	"fmt"
 	"log"
 	"io"
 	"os"
-
 )
 
 func main() {
 	if err := db.InitDB(configs.GetDBUrl()); err != nil {
 		panic("Failed to connect to database: " + err.Error())
 	}
+
+	templates.SeedTemplates()
 
 	gin.DisableConsoleColor()
 	os.MkdirAll("logs", 0755)
@@ -22,7 +26,7 @@ func main() {
 	gin.DefaultWriter = io.MultiWriter(f)
 	app := gin.Default()
 
-	routers.AuthRouters(app)
-	fmt.Println("Backend Service is running on port", "http://localhost"+configs.GetAppPort())
+	routers.PosterRouters(app)
+	fmt.Println("Poster Service is running on port", "http://localhost"+configs.GetAppPort())
 	app.Run(configs.GetAppPort())
 }
