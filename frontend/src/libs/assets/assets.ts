@@ -36,6 +36,13 @@ export async function uploadAsset(file: File): Promise<PosterAsset> {
   return data as PosterAsset
 }
 
+export function resolveAssetUrl(url: string): string {
+  if (url.startsWith("http")) {
+    return url
+  }
+  return new URL(API_CONFIG.BASE_URL).origin + url
+}
+
 export async function deleteAsset(id: number): Promise<void> {
   const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ASSET_ENDPOINTS.DELETE}/${id}`, {
     method: "DELETE",
