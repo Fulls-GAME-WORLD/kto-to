@@ -40,7 +40,7 @@
 }
 
 .stage-block.selected {
-    outline: 2px solid #2684ff;
+    outline: 2px solid var(--accent-color);
 }
 
 .stage-rect {
