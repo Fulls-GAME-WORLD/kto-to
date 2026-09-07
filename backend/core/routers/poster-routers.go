@@ -1,10 +1,12 @@
 package routers
 
 import (
+	"kak-to/core/api/templates"
 	"github.com/gin-gonic/gin"
-	"kak-to/api/templates"
-	"kak-to/api/posters"
-	"kak-to/api/assets"
+	"kak-to/utils/middleware"
+	"kak-to/core/api/posters"
+	"kak-to/core/api/assets"
+	"kak-to/core/api/auth"
 )
 
 func PosterRouters(app *gin.Engine) {
@@ -16,17 +18,23 @@ func PosterRouters(app *gin.Engine) {
 			c.JSON(200, gin.H{"message": "Poster API is working"})
 		})
 
-		v1.POST("/posters", posters.CreatePoster)
-		v1.GET("/posters", posters.ListPosters)
-		v1.GET("/posters/:id", posters.GetPoster)
-		v1.PUT("/posters/:id", posters.UpdatePoster)
-		v1.DELETE("/posters/:id", posters.DeletePoster)
-
-		v1.POST("/assets", assets.UploadAsset)
-		v1.GET("/assets", assets.ListAssets)
-		v1.DELETE("/assets/:id", assets.DeleteAsset)
-
+		v1.POST("/start/register", auth.Register)
+		v1.POST("/start/login", auth.Login)
 		v1.GET("/templates", templates.ListTemplates)
-		v1.POST("/templates/:id/clone", templates.CloneTemplate)
+	}
+
+	protected := app.Group("/api/v1/poster")
+	protected.Use(middleware.AuthMiddleware())
+	{
+		protected.GET("/get/my/profile", auth.My)
+		protected.POST("/posters", posters.CreatePoster)
+		protected.GET("/posters", posters.ListPosters)
+		protected.GET("/posters/:id", posters.GetPoster)
+		protected.PUT("/posters/:id", posters.UpdatePoster)
+		protected.DELETE("/posters/:id", posters.DeletePoster)
+		protected.POST("/assets", assets.UploadAsset)
+		protected.GET("/assets", assets.ListAssets)
+		protected.DELETE("/assets/:id", assets.DeleteAsset)
+		protected.POST("/templates/:id/clone", templates.CloneTemplate)
 	}
 }
