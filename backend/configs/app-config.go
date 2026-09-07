@@ -1,16 +1,16 @@
 package configs
 
-func DevGetAppPort() string {
-	PORT := "8889"
-	return ":" + PORT
+func GetAppPort() string {
+	SERVER_PORT := "8889"
+	return ":" + SERVER_PORT
 }
 
-func DevGetJWTSecret() string {
+func GetJWTSecret() string {
 	JWT_SECRET := "0000000000000000000000000000000000000000000000"
 	return JWT_SECRET
 }
 
-func DevGetDBUrl() string {
+func GetDBUrl() string {
 	DB_URL := "postgres://postgres:postgres@localhost:19930/kak_to?sslmode=disable"
 	return DB_URL
 }
