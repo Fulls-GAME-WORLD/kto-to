@@ -21,7 +21,7 @@ func testrouters(app *gin.RouterGroup) {
 func PosterRouters(app *gin.Engine) {
 	app.Static("/uploads", "./uploads")
 
-	v1 := app.Group("/api/v1/poster")
+	v1 := app.Group("/api/v1/main/poster/backend/service")
 	{
 		testrouters(v1)
 
@@ -30,7 +30,7 @@ func PosterRouters(app *gin.Engine) {
 		v1.GET("/get/templates", templates.ListTemplates)
 	}
 
-	protected := app.Group("/api/v1/poster")
+	protected := app.Group("/api/v1/main/poster/backend/service")
 	protected.Use(middleware.AuthMiddleware())
 	{
 		protected.GET("/get/my/profile", auth.My)
