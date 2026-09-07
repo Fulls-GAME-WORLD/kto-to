@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { type FormEvent, useState } from "react"
+import MainMenu from "../../components/menu/MainMenu.tsx"
 import { loginInMyAccount } from "../../libs/auth/login.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
 import LoginEmail from "./components/login/EmailInput.tsx"
@@ -32,7 +33,9 @@ function Login() {
   }
 
   return (
-    <main className="main-pages">
+    <>
+      <MainMenu />
+      <main className="main-pages">
       <div className="pages">
         <form className="auth-form" onSubmit={submitLoginForm}>
           <AuthFormTitle title={TextConfig.login} />
@@ -43,7 +46,8 @@ function Login() {
           <AuthPageSwitch to="/start/auth/register" label={TextConfig.noAccount} />
         </form>
       </div>
-    </main>
+      </main>
+    </>
   )
 }
 

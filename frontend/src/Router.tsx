@@ -12,6 +12,15 @@ const Register = lazy(() => import('./pages/auth/Register.tsx'))
 {/* Gallery */}
 const Gallery = lazy(() => import('./pages/gallery/Gallery.tsx'))
 
+{/* Dashboard */}
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard.tsx'))
+
+{/* Profile */}
+const Profile = lazy(() => import('./pages/profile/Profile.tsx'))
+
+{/* Editor */}
+const Editor = lazy(() => import('./pages/editor/Editor.tsx'))
+
 
 
 function Router() {
@@ -22,6 +31,9 @@ function Router() {
                 <Route path="/start/auth/login" element={<Login />} />
                 <Route path="/start/auth/register" element={<Register />} />
                 <Route path="/my/gallery" element={<Gallery />} />
+                <Route path="/my/dashboard" element={<Dashboard />} />
+                <Route path="/my/profile" element={<Profile />} />
+                <Route path="/my/poster/:posterId" element={<Editor />} />
             </Routes>
         </>
     )

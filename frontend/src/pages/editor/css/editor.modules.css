@@ -1,0 +1,108 @@
+.poster-topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.poster-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.editor-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.poster-print-stage {
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.stage-block {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+}
+
+.stage-block.selected {
+    outline: 2px solid #2684ff;
+}
+
+.stage-rect {
+    width: 100%;
+    height: 100%;
+}
+
+.stage-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.stage-block img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.editor-side {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 260px;
+}
+
+.poster-props {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.poster-layers ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.poster-layers li {
+    display: flex;
+    gap: 4px;
+}
+
+.poster-layers li.active {
+    font-weight: 700;
+}
+
+.editor-error {
+    border: 1px solid #c0392b;
+    border-radius: 8px;
+    padding: 16px;
+    max-width: 480px;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .poster-print-stage {
+        visibility: visible;
+        position: fixed;
+        left: 0;
+        top: 0;
+    }
+
+    .poster-print-stage * {
+        visibility: visible;
+    }
+}

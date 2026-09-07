@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { type FormEvent, useState } from "react"
+import MainMenu from "../../components/menu/MainMenu.tsx"
 import { registerMyNewAccount } from "../../libs/auth/registers.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
 import RegisterName from "./components/registers/Name.tsx"
@@ -34,7 +35,9 @@ function Register() {
   }
 
   return (
-    <main className="main-pages">
+    <>
+      <MainMenu />
+      <main className="main-pages">
       <div className="pages">
         <form className="auth-form" onSubmit={submitRegisterForm}>
           <AuthFormTitle title={TextConfig.register} />
@@ -45,9 +48,9 @@ function Register() {
           <RegisterButtons />
           <AuthPageSwitch to="/start/auth/login" label={TextConfig.haveAccount} />
         </form>
-      </div>
-    </main>
-  )
+        </div>
+      </main>
+    </>
 }
 
 export default Register
