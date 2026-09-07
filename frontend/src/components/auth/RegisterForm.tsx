@@ -2,6 +2,13 @@ import { useState } from "react"
 import type { FormEvent } from "react"
 import { register } from "../../libs/auth/auth.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
+import AuthTitle from "./atoms/AuthTitle.tsx"
+import AuthError from "./atoms/AuthError.tsx"
+import NameInput from "./inputs/NameInput.tsx"
+import EmailInput from "./inputs/EmailInput.tsx"
+import PasswordInput from "./inputs/PasswordInput.tsx"
+import SubmitButton from "./buttons/SubmitButton.tsx"
+import AuthSwitch from "./buttons/AuthSwitch.tsx"
 
 interface RegisterFormProps {
   onDone: () => void
@@ -26,21 +33,13 @@ function RegisterForm({ onDone }: RegisterFormProps) {
 
   return (
     <form className="auth-form" onSubmit={submit}>
-      <h2>{TextConfig.register}</h2>
-      <label>
-        {TextConfig.name}
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-      </label>
-      <label>
-        {TextConfig.email}
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </label>
-      <label>
-        {TextConfig.password}
-        <input type="password" value={password} minLength={8} onChange={(e) => setPassword(e.target.value)} required />
-      </label>
-      {error !== "" && <p className="auth-error">{error}</p>}
-      <button type="submit">{TextConfig.doRegister}</button>
+      <AuthTitle title={TextConfig.register} />
+      <NameInput value={name} onChange={setName} />
+      <EmailInput value={email} onChange={setEmail} />
+      <PasswordInput value={password} onChange={setPassword} />
+      <AuthError message={error} />
+      <SubmitButton label={TextConfig.doRegister} />
+      <AuthSwitch to="/login" label={TextConfig.haveAccount} />
     </form>
   )
 }

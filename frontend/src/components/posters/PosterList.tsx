@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { listPosters, deletePoster, type Poster } from "../../libs/posters/posters.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
+import PosterCard from "./PosterCard.tsx"
 
 function PosterList() {
   const navigate = useNavigate()
@@ -29,14 +30,12 @@ function PosterList() {
       <h2>{TextConfig.myPosters}</h2>
       <div className="poster-grid">
         {posters.map((poster) => (
-          <article key={poster.id} className="poster-card">
-            <h3>{poster.name}</h3>
-            <p>{poster.format} · {poster.width}x{poster.height}</p>
-            <div className="poster-card-actions">
-              <button onClick={() => navigate(`/editor/${poster.id}`)}>{TextConfig.open}</button>
-              <button onClick={() => remove(poster.id)}>{TextConfig.remove}</button>
-            </div>
-          </article>
+          <PosterCard
+            key={poster.id}
+            poster={poster}
+            onOpen={() => navigate(`/editor/${poster.id}`)}
+            onRemove={() => remove(poster.id)}
+          />
         ))}
       </div>
     </section>

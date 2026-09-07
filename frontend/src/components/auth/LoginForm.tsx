@@ -2,6 +2,12 @@ import { useState } from "react"
 import type { FormEvent } from "react"
 import { login } from "../../libs/auth/auth.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
+import AuthTitle from "./atoms/AuthTitle.tsx"
+import AuthError from "./atoms/AuthError.tsx"
+import EmailInput from "./inputs/EmailInput.tsx"
+import PasswordInput from "./inputs/PasswordInput.tsx"
+import SubmitButton from "./buttons/SubmitButton.tsx"
+import AuthSwitch from "./buttons/AuthSwitch.tsx"
 
 interface LoginFormProps {
   onDone: () => void
@@ -25,17 +31,12 @@ function LoginForm({ onDone }: LoginFormProps) {
 
   return (
     <form className="auth-form" onSubmit={submit}>
-      <h2>{TextConfig.login}</h2>
-      <label>
-        {TextConfig.email}
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </label>
-      <label>
-        {TextConfig.password}
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </label>
-      {error !== "" && <p className="auth-error">{error}</p>}
-      <button type="submit">{TextConfig.doLogin}</button>
+      <AuthTitle title={TextConfig.login} />
+      <EmailInput value={email} onChange={setEmail} />
+      <PasswordInput value={password} onChange={setPassword} />
+      <AuthError message={error} />
+      <SubmitButton label={TextConfig.doLogin} />
+      <AuthSwitch to="/register" label={TextConfig.noAccount} />
     </form>
   )
 }

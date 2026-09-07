@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { listTemplates, cloneTemplate, type PosterTemplate } from "../../libs/templates/templates.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
+import TemplateCard from "./TemplateCard.tsx"
 
 function TemplateList() {
   const navigate = useNavigate()
@@ -23,11 +24,7 @@ function TemplateList() {
       <h2>{TextConfig.templates}</h2>
       <div className="poster-grid">
         {templates.map((tpl) => (
-          <article key={tpl.id} className="poster-card">
-            <h3>{tpl.name}</h3>
-            <p>{tpl.format}</p>
-            <button onClick={() => use(tpl.id)}>{TextConfig.clone}</button>
-          </article>
+          <TemplateCard key={tpl.id} template={tpl} onUse={() => use(tpl.id)} />
         ))}
       </div>
     </section>

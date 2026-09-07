@@ -1,17 +1,31 @@
 import { API_CONFIG } from "../configs/api/config/apiConfig.ts"
 
-const TOKEN_KEY = "poster_token"
+const AUTH_TOKEN_COOKIE = "auth_token"
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 60
 
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY)
+  if (typeof document === "undefined") {
+    return null
+  }
+  const found = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${AUTH_TOKEN_COOKIE}=`))
+  return found ? decodeURIComponent(found.split("=")[1]) : null
 }
 
 export function setToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token)
+  if (typeof document === "undefined") {
+    return
+  }
+  const secure = window.location.protocol === "https:" ? "; Secure" : ""
+  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=${AUTH_COOKIE_MAX_AGE}; SameSite=Lax${secure}`
 }
 
 export function clearToken(): void {
-  localStorage.removeItem(TOKEN_KEY)
+  if (typeof document === "undefined") {
+    return
+  }
+  document.cookie = `${AUTH_TOKEN_COOKIE}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/`
 }
 
 export function authHeaders(): Record<string, string> {
