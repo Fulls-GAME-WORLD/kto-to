@@ -3,15 +3,7 @@ import { useParams } from "react-router-dom"
 import MainMenu from "../../components/menu/MainMenu.tsx"
 import { getPoster, updatePoster } from "../../libs/posters/posters.ts"
 import { resolveAssetUrl, uploadAsset } from "../../libs/assets/assets.ts"
-import {
-  emptyScene,
-  makeBlock,
-  parseScene,
-  serializeScene,
-  type BlockType,
-  type SceneBlock,
-  type SceneDoc,
-} from "../../libs/editor/scene.ts"
+import { emptyScene, makeBlock, parseScene, serializeScene, type BlockType, type SceneBlock, type SceneDoc,} from "../../libs/editor/scene.ts"
 import { exportSceneToPng } from "../../libs/editor/export-png.ts"
 import TextConfig from "../../libs/configs/site/text.configs.ts"
 import PosterTopbar from "./components/topbar/PosterTopbar.tsx"
