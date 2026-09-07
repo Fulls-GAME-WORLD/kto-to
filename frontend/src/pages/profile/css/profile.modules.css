@@ -1,0 +1,13 @@
+.profile-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 480px;
+}
+
+.profile-error {
+    border: 1px solid #c0392b;
+    border-radius: 8px;
+    padding: 16px;
+    max-width: 480px;
+}
