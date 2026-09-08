@@ -16,11 +16,23 @@ export interface ImportResult {
   importedCount: number
 }
 
-export async function convertHtmlToSceneBlocks(
+export function convertHtmlToSceneBlocks(
   rawHtml: string,
   options: ImportOptions,
   currentDoc: SceneDoc
 ): Promise<ImportResult> {
+  const trimmed = rawHtml.trim()
+  const isFullDoc =
+    /^<!doctype/i.test(trimmed) ||
+    /<html[\s>]/i.test(trimmed) ||
+    /<head[\s>]/i.test(trimmed) ||
+    /<body[\s>]/i.test(trimmed)
+
+  const noScript = rawHtml.replace(/<script[\s\S]*?<\/script\s*>/gi, "")
+  const htmlToWrite = isFullDoc
+    ? noScript
+    : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${noScript}</body></html>`
+
   const iframe = document.createElement("iframe")
   iframe.style.position = "fixed"
   iframe.style.left = "-9999px"
@@ -30,42 +42,59 @@ export async function convertHtmlToSceneBlocks(
   iframe.style.opacity = "0"
   iframe.style.pointerEvents = "none"
   iframe.style.border = "none"
-
-  document.body.appendChild(iframe)
+  iframe.setAttribute("aria-hidden", "true")
+  iframe.tabIndex = -1
 
   return new Promise((resolve) => {
-    iframe.onload = () => {
-      const win = iframe.contentWindow
-      const run = () => {
-        try {
-          const doc = iframe.contentDocument || win?.document
-          if (!doc) {
-            throw new Error("Unable to access iframe document")
-          }
+    let settled = false
 
-          const container = doc.body
-          const rootRect = container.getBoundingClientRect()
-          const blocks: SceneBlock[] = []
-          let canvasBg = currentDoc.bg
+    function cleanup() {
+      if (iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe)
+      }
+    }
 
-          if (win) {
-            const bodyBg = parseRgbColor(win.getComputedStyle(container).backgroundColor)
-            const htmlBg = parseRgbColor(win.getComputedStyle(win.document.documentElement).backgroundColor)
-            const detectedBg = bodyBg || htmlBg
-            if (detectedBg) {
-              canvasBg = detectedBg
-            }
-          }
+    function finish(result: ImportResult) {
+      if (settled) {
+        return
+      }
+      settled = true
+      cleanup()
+      resolve(result)
+    }
+
+    function measure() {
+      try {
+        const win = iframe.contentWindow
+        const doc = iframe.contentDocument || win?.document
+        if (!doc || !win) {
+          throw new Error("no iframe doc")
+        }
+
+        const container = doc.body
+        if (!container) {
+          throw new Error("no body")
+        }
+        const rootRect = container.getBoundingClientRect()
+        const blocks: SceneBlock[] = []
+        let canvasBg = currentDoc.bg
+
+        const bodyBg = parseRgbColor(win.getComputedStyle(container).backgroundColor)
+        const htmlBg = parseRgbColor(win.getComputedStyle(win.document.documentElement).backgroundColor)
+        const detectedBg = bodyBg || htmlBg
+        if (detectedBg) {
+          canvasBg = detectedBg
+        }
 
         const elements = Array.from(container.querySelectorAll<HTMLElement>("*"))
 
         for (const el of elements) {
           const tag = el.tagName.toLowerCase()
-          if (["script", "style", "meta", "link", "noscript"].includes(tag)) {
+          if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript" || tag === "svg" || tag === "canvas") {
             continue
           }
 
-          const style = iframe.contentWindow?.getComputedStyle(el)
+          const style = win.getComputedStyle(el)
           if (!style || style.display === "none" || style.visibility === "hidden" || style.opacity === "0") {
             continue
           }
@@ -82,15 +111,15 @@ export async function convertHtmlToSceneBlocks(
 
           const bg = parseRgbColor(style.backgroundColor)
           const bgImg = style.backgroundImage && style.backgroundImage !== "none" ? extractImageUrl(style.backgroundImage) : ""
-          const opacity = parseFloat(style.opacity || "1")
-          const opacityVal = Number.isFinite(opacity) ? Math.max(0, Math.min(1, opacity)) : 1
+          const opacityRaw = parseFloat(style.opacity || "1")
+          const opacityVal = Number.isFinite(opacityRaw) ? Math.max(0, Math.min(1, opacityRaw)) : 1
 
           let radius = 0
           const rawRadius = style.borderRadius || ""
           if (rawRadius) {
             if (rawRadius.includes("%")) {
               const pct = parseFloat(rawRadius) || 0
-              radius = Math.round(Math.min(w, h) / 2 * (pct / 50))
+              radius = Math.round((Math.min(w, h) / 2) * (pct / 50))
               if (pct >= 50 && Math.abs(w - h) < 8) {
                 radius = 999
               }
@@ -98,49 +127,16 @@ export async function convertHtmlToSceneBlocks(
               radius = Math.round(parseFloat(rawRadius) || 0)
             }
           }
-          if (style.borderTopLeftRadius) {
-            const tr = parseFloat(style.borderTopLeftRadius) || 0
-            if (tr > radius) radius = Math.round(tr)
+          const tl = parseFloat(style.borderTopLeftRadius) || 0
+          if (tl > radius) {
+            radius = Math.round(tl)
           }
           radius = Math.max(0, Math.min(radius, Math.min(w, h) / 2))
-
-          const isSvg = tag === "svg"
-          if (isSvg) {
-            continue
-          }
 
           if (tag === "img") {
             const imgEl = el as HTMLImageElement
             const src = imgEl.currentSrc || imgEl.src || ""
-            if (src && !src.startsWith("data:") || src) {
-              if (w > 4 && h > 4) {
-                blocks.push({
-                  id: makeId(),
-                  type: "image",
-                  x,
-                  y,
-                  w: Math.max(20, w),
-                  h: Math.max(20, h),
-                  text: "",
-                  fontSize: 16,
-                  color: "#000000",
-                  bg: "transparent",
-                  src,
-                  radius: radius > 2 ? radius : 8,
-                  opacity: opacityVal,
-                })
-              }
-            }
-            continue
-          }
-
-          const hasDirectText = Array.from(el.childNodes).some(
-            (node) => node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim().length > 0
-          )
-
-          if (bgImg && bgImg.length > 4) {
-            const isProbablyGradient = bgImg.includes("gradient")
-            if (!isProbablyGradient) {
+            if (src && w > 4 && h > 4) {
               blocks.push({
                 id: makeId(),
                 type: "image",
@@ -152,38 +148,57 @@ export async function convertHtmlToSceneBlocks(
                 fontSize: 16,
                 color: "#000000",
                 bg: "transparent",
-                src: bgImg,
-                radius,
+                src,
+                radius: radius > 2 ? radius : 8,
                 opacity: opacityVal,
               })
-              if (hasDirectText) {
-                const directText = Array.from(el.childNodes)
-                  .filter((n) => n.nodeType === Node.TEXT_NODE)
-                  .map((n) => (n.textContent || "").trim())
-                  .filter(Boolean)
-                  .join(" ")
-                if (directText) {
-                  const fontSize = Math.round(parseFloat(style.fontSize) || 16)
-                  const color = parseRgbColor(style.color) || "#111111"
-                  blocks.push({
-                    id: makeId(),
-                    type: "text",
-                    x: Math.max(0, x + 8),
-                    y: Math.max(0, y + 8),
-                    w: Math.max(40, w - 16),
-                    h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 8)),
-                    text: directText.slice(0, 400),
-                    fontSize: Math.max(10, Math.min(96, fontSize)),
-                    color,
-                    bg: "transparent",
-                    src: "",
-                    radius: 0,
-                    opacity: opacityVal,
-                  })
-                }
-              }
-              continue
             }
+            continue
+          }
+
+          const directText = Array.from(el.childNodes)
+            .filter((n) => n.nodeType === Node.TEXT_NODE)
+            .map((n) => (n.textContent || "").trim())
+            .filter(Boolean)
+            .join(" ")
+          const hasDirectText = directText.length > 0
+
+          if (bgImg && bgImg.length > 4 && !bgImg.includes("gradient")) {
+            blocks.push({
+              id: makeId(),
+              type: "image",
+              x,
+              y,
+              w: Math.max(20, w),
+              h: Math.max(20, h),
+              text: "",
+              fontSize: 16,
+              color: "#000000",
+              bg: "transparent",
+              src: bgImg,
+              radius,
+              opacity: opacityVal,
+            })
+            if (hasDirectText) {
+              const fontSize = Math.round(parseFloat(style.fontSize) || 16)
+              const color = parseRgbColor(style.color) || "#111111"
+              blocks.push({
+                id: makeId(),
+                type: "text",
+                x: Math.max(0, x + 8),
+                y: Math.max(0, y + 8),
+                w: Math.max(40, w - 16),
+                h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 8)),
+                text: directText.slice(0, 400),
+                fontSize: Math.max(10, Math.min(96, fontSize)),
+                color,
+                bg: "transparent",
+                src: "",
+                radius: 0,
+                opacity: opacityVal,
+              })
+            }
+            continue
           }
 
           if (bg && bg !== "transparent") {
@@ -203,72 +218,48 @@ export async function convertHtmlToSceneBlocks(
               radius: isCircle ? 999 : radius,
               opacity: opacityVal,
             })
-            if (hasDirectText) {
-              const directText = Array.from(el.childNodes)
-                .filter((n) => n.nodeType === Node.TEXT_NODE)
-                .map((n) => (n.textContent || "").trim())
-                .filter(Boolean)
-                .join(" ")
-              if (directText) {
-                const fontSize = Math.round(parseFloat(style.fontSize) || 16)
-                const color = parseRgbColor(style.color) || "#111111"
-                const hasBg = true
-                if (hasBg && directText.length < 300) {
-                  blocks.push({
-                    id: makeId(),
-                    type: "text",
-                    x: Math.max(0, x + 8),
-                    y: Math.max(0, y + Math.max(8, (h - fontSize * 1.2) / 2)),
-                    w: Math.max(40, w - 16),
-                    h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 4)),
-                    text: directText.slice(0, 400),
-                    fontSize: Math.max(10, Math.min(96, fontSize)),
-                    color,
-                    bg: "transparent",
-                    src: "",
-                    radius: 0,
-                    opacity: opacityVal,
-                  })
-                }
-              }
+            if (hasDirectText && directText.length < 300) {
+              const fontSize = Math.round(parseFloat(style.fontSize) || 16)
+              const color = parseRgbColor(style.color) || "#111111"
+              blocks.push({
+                id: makeId(),
+                type: "text",
+                x: Math.max(0, x + 8),
+                y: Math.max(0, y + Math.max(8, (h - fontSize * 1.2) / 2)),
+                w: Math.max(40, w - 16),
+                h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 4)),
+                text: directText.slice(0, 400),
+                fontSize: Math.max(10, Math.min(96, fontSize)),
+                color,
+                bg: "transparent",
+                src: "",
+                radius: 0,
+                opacity: opacityVal,
+              })
             }
             continue
           }
 
-          if (hasDirectText) {
-            const directText = Array.from(el.childNodes)
-              .filter((n) => n.nodeType === Node.TEXT_NODE)
-              .map((n) => (n.textContent || "").trim())
-              .filter(Boolean)
-              .join(" ")
-
-            if (directText && directText.length > 0) {
-              const styleColor = parseRgbColor(style.color) || "#111111"
-              const rawSize = parseFloat(style.fontSize) || 16
-              const fontSize = Math.round(rawSize)
-              const isHeading = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(tag)
-              const isButton = tag === "button" || tag === "a"
-              const effectiveH = Math.max(18, Math.min(h, fontSize * (isHeading ? 1.25 : 1.4) + 8))
-              const effectiveW = Math.max(40, w)
-
-              if (directText.length <= 500) {
-                blocks.push({
-                  id: makeId(),
-                  type: "text",
-                  x,
-                  y,
-                  w: effectiveW,
-                  h: effectiveH,
-                  text: directText.slice(0, 500),
-                  fontSize: Math.max(10, Math.min(isButton ? 18 : 96, fontSize)),
-                  color: styleColor,
-                  bg: "transparent",
-                  src: "",
-                  radius: 0,
-                  opacity: opacityVal,
-                })
-              }
-            }
+          if (hasDirectText && directText.length <= 500) {
+            const styleColor = parseRgbColor(style.color) || "#111111"
+            const fontSize = Math.round(parseFloat(style.fontSize) || 16)
+            const isHeading = tag === "h1" || tag === "h2" || tag === "h3" || tag === "h4" || tag === "h5" || tag === "h6"
+            const isButton = tag === "button" || tag === "a"
+            blocks.push({
+              id: makeId(),
+              type: "text",
+              x,
+              y,
+              w: Math.max(40, w),
+              h: Math.max(18, Math.min(h, fontSize * (isHeading ? 1.25 : 1.4) + 8)),
+              text: directText.slice(0, 500),
+              fontSize: Math.max(10, Math.min(isButton ? 18 : 96, fontSize)),
+              color: styleColor,
+              bg: "transparent",
+              src: "",
+              radius: 0,
+              opacity: opacityVal,
+            })
           }
         }
 
@@ -279,48 +270,38 @@ export async function convertHtmlToSceneBlocks(
           maxBottom = Math.max(maxBottom, b.y + b.h)
         }
 
-        const newDoc: SceneDoc = {
-          v: 1,
-          bg: canvasBg,
-          blocks: options.replaceCanvas ? blocks : [...currentDoc.blocks, ...blocks],
-        }
-
-        document.body.removeChild(iframe)
-
-        resolve({
-          doc: newDoc,
+        finish({
+          doc: {
+            v: 1,
+            bg: canvasBg,
+            blocks: options.replaceCanvas ? blocks : [...currentDoc.blocks, ...blocks],
+          },
           width: options.resizeCanvasToFit && maxRight > 100 ? Math.max(maxRight + 32, 400) : undefined,
           height: options.resizeCanvasToFit && maxBottom > 100 ? Math.max(maxBottom + 32, 400) : undefined,
           importedCount: blocks.length,
         })
       } catch {
-        if (iframe.parentNode) {
-          document.body.removeChild(iframe)
-        }
-        resolve({
-          doc: currentDoc,
-          importedCount: 0,
-        })
-      }
-      }
-      if (win) {
-        win.requestAnimationFrame(() => win.requestAnimationFrame(() => setTimeout(run, 30)))
-      } else {
-        setTimeout(run, 30)
+        finish({ doc: currentDoc, importedCount: 0 })
       }
     }
 
-    const doc = iframe.contentDocument || iframe.contentWindow?.document
-    if (doc) {
-      const trimmed = rawHtml.trim()
-      const isFullDoc = /^<!doctype/i.test(trimmed) || /<html[\s>]/i.test(trimmed) || /<head[\s>]/i.test(trimmed) || /<body[\s>]/i.test(trimmed)
-      const htmlToWrite = isFullDoc ? rawHtml : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`
-      doc.open()
-      doc.write(htmlToWrite)
-      doc.close()
-    } else {
-      document.body.removeChild(iframe)
-      resolve({ doc: currentDoc, importedCount: 0 })
+    iframe.onload = () => {
+      const win = iframe.contentWindow
+      if (win) {
+        win.requestAnimationFrame(() => {
+          win.requestAnimationFrame(() => {
+            window.setTimeout(measure, 150)
+          })
+        })
+      } else {
+        window.setTimeout(measure, 150)
+      }
     }
+
+    document.body.appendChild(iframe)
+    iframe.srcdoc = htmlToWrite
+    window.setTimeout(() => {
+      finish({ doc: currentDoc, importedCount: 0 })
+    }, 8000)
   })
 }
