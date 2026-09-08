@@ -189,7 +189,7 @@ export function convertHtmlToSceneBlocks(
 
         for (const el of elements) {
           const tag = el.tagName.toLowerCase()
-          if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript" || tag === "svg" || tag === "canvas") {
+          if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript" || tag === "canvas") {
             continue
           }
           if ((el as HTMLElement).dataset.figmaBg === "1") {
@@ -243,6 +243,40 @@ export function convertHtmlToSceneBlocks(
             radius = Math.round(tl)
           }
           radius = Math.max(0, Math.min(radius, Math.min(w, h) / 2))
+
+          if (tag === "svg") {
+            if (w > 4 && h > 4) {
+              try {
+                const clone = el.cloneNode(true) as unknown as SVGSVGElement
+                clone.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+                clone.setAttribute("width", String(Math.max(1, Math.round(w))))
+                clone.setAttribute("height", String(Math.max(1, Math.round(h))))
+                const svgText = new XMLSerializer().serializeToString(clone)
+                blocks.push({
+                  id: makeId(),
+                  type: "image",
+                  x,
+                  y,
+                  w: Math.max(20, w),
+                  h: Math.max(20, h),
+                  text: "",
+                  fontSize: 16,
+                  color: "#000000",
+                  bg: "transparent",
+                  src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`,
+                  radius,
+                  opacity: opacityVal,
+                })
+              } catch {
+                window.console.warn("[html-import] bad svg skipped")
+              }
+            }
+            continue
+          }
+          const svgHost = el as unknown as Element
+          if (typeof svgHost.closest === "function" && svgHost.closest("svg")) {
+            continue
+          }
 
           if (tag === "img") {
             const imgEl = el as HTMLImageElement
