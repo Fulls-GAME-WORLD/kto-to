@@ -32,6 +32,15 @@ export function convertHtmlToSceneBlocks(
     ? rawHtml
     : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`
 
+  window.console.info("[html-import] input", {
+    rawLen: rawHtml.length,
+    isFullDoc,
+    outLen: htmlToWrite.length,
+    hasStyleTag: /<style[\s>]/i.test(rawHtml),
+    hasLinkTag: /<link[\s>]/i.test(rawHtml),
+    hasBodyCss: /body\s*\{[^}]*background/i.test(rawHtml),
+  })
+
   const iframe = document.createElement("iframe")
   iframe.style.position = "fixed"
   iframe.style.left = "-9999px"
@@ -78,8 +87,20 @@ export function convertHtmlToSceneBlocks(
         const blocks: SceneBlock[] = []
         let canvasBg = currentDoc.bg
 
-        const bodyBg = parseRgbColor(win.getComputedStyle(container).backgroundColor)
-        const htmlBg = parseRgbColor(win.getComputedStyle(win.document.documentElement).backgroundColor)
+        const bodyCs = win.getComputedStyle(container)
+        const htmlCs = win.getComputedStyle(win.document.documentElement)
+        window.console.info("[html-import] computed bg", {
+          bodyBgRaw: bodyCs.backgroundColor,
+          bodyBgImgRaw: String(bodyCs.backgroundImage).slice(0, 120),
+          htmlBgRaw: htmlCs.backgroundColor,
+          htmlBgImgRaw: String(htmlCs.backgroundImage).slice(0, 120),
+          innerW: win.innerWidth,
+          innerH: win.innerHeight,
+          rootRect: `${Math.round(rootRect.width)}x${Math.round(rootRect.height)} @${Math.round(rootRect.left)},${Math.round(rootRect.top)}`,
+          totalElements: container.querySelectorAll("*").length,
+        })
+        const bodyBg = parseRgbColor(bodyCs.backgroundColor)
+        const htmlBg = parseRgbColor(htmlCs.backgroundColor)
         let detectedBg = bodyBg || htmlBg
 
         if (!detectedBg) {
@@ -123,17 +144,33 @@ export function convertHtmlToSceneBlocks(
           } else if (bestGradient) {
             detectedBg = bestGradient
           }
+          window.console.info("[html-import] fullscreen fallback", {
+            checked: candidates.length,
+            bestBg,
+            bestArea: Math.round(bestArea),
+            bestEl: bestEl ? `${bestEl.tagName.toLowerCase()}.${String((bestEl as HTMLElement).className).slice(0, 60)}` : null,
+            bestGradient,
+          })
         }
 
         if (detectedBg) {
           canvasBg = detectedBg
         }
 
-        window.console.info("[html-import]", {
+        const byType: Record<string, number> = {}
+        for (const b of blocks) {
+          byType[b.type] = (byType[b.type] || 0) + 1
+        }
+        window.console.info("[html-import] result", {
           bodyBg,
           htmlBg,
           canvasBg,
+          currentBg: currentDoc.bg,
+          replaceCanvas: options.replaceCanvas,
           blocks: blocks.length,
+          byType,
+          textColors: blocks.filter((b) => b.type === "text").slice(0, 8).map((b) => b.color),
+          blockBgs: blocks.filter((b) => b.type === "rect" || b.type === "circle").slice(0, 8).map((b) => b.bg),
         })
 
         const elements = Array.from(container.querySelectorAll<HTMLElement>("*"))
@@ -333,13 +370,35 @@ export function convertHtmlToSceneBlocks(
           height: options.resizeCanvasToFit && maxBottom > 100 ? Math.max(maxBottom + 32, 400) : undefined,
           importedCount: blocks.length,
         })
-      } catch {
+      } catch (e) {
+        window.console.error("[html-import] measure failed", e)
         finish({ doc: currentDoc, importedCount: 0 })
       }
     }
 
     iframe.onload = () => {
       const win = iframe.contentWindow
+      try {
+        const d = iframe.contentDocument || win?.document
+        const sheets = d ? Array.from(d.styleSheets) : []
+        window.console.info("[html-import] iframe loaded", {
+          title: d?.title,
+          bodyChildren: d?.body?.childElementCount,
+          styleTags: d?.querySelectorAll("style").length,
+          linkTags: d?.querySelectorAll('link[rel="stylesheet"]').length,
+          styleSheets: sheets.length,
+          sheetHrefs: sheets.map((s) => {
+            try {
+              return (s as CSSStyleSheet).href || "(inline)"
+            } catch {
+              return "(blocked)"
+            }
+          }),
+          bodyHtmlLen: d?.body?.innerHTML.length,
+        })
+      } catch (e) {
+        window.console.warn("[html-import] iframe inspect failed", e)
+      }
       const afterFonts = () => {
         if (win) {
           win.requestAnimationFrame(() => {
@@ -384,6 +443,7 @@ export function convertHtmlToSceneBlocks(
     iframe.srcdoc = htmlToWrite
     window.setTimeout(() => {
       if (!settled) {
+        window.console.warn("[html-import] onload never fired, measuring anyway")
         measure()
       }
     }, 4000)
