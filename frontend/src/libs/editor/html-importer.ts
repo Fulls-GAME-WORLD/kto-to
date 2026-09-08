@@ -303,23 +303,13 @@ export async function convertHtmlToSceneBlocks(
 
     const doc = iframe.contentDocument || iframe.contentWindow?.document
     if (doc) {
+      const trimmed = rawHtml.trim()
+      const isFullDoc = /^<!doctype/i.test(trimmed) || /<html[\s>]/i.test(trimmed) || /<head[\s>]/i.test(trimmed) || /<body[\s>]/i.test(trimmed)
+      const htmlToWrite = isFullDoc
+        ? rawHtml
+        : `<!DOCTYPE html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0}img{max-width:100%;height:auto}</style></head><body>${rawHtml}</body></html>`
       doc.open()
-      doc.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <style>
-              * { box-sizing: border-box; }
-              body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: ${currentDoc.bg}; }
-              img { max-width: 100%; height: auto; }
-            </style>
-          </head>
-          <body>
-            ${rawHtml}
-          </body>
-        </html>
-      `)
+      doc.write(htmlToWrite)
       doc.close()
     } else {
       document.body.removeChild(iframe)
