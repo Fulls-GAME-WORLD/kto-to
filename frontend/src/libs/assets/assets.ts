@@ -37,10 +37,10 @@ export async function uploadAsset(file: File): Promise<PosterAsset> {
 }
 
 export function resolveAssetUrl(url: string): string {
-  if (url.startsWith("http")) {
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
     return url
   }
-  return new URL(API_CONFIG.BASE_URL).origin + url
+  return url
 }
 
 export async function deleteAsset(id: number): Promise<void> {
