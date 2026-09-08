@@ -16,6 +16,44 @@ export interface ImportResult {
   importedCount: number
 }
 
+interface TextNodeBox {
+  text: string
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+function directTextBoxes(el: HTMLElement, doc: Document, rootLeft: number, rootTop: number): TextNodeBox[] {
+  const boxes: TextNodeBox[] = []
+  for (const node of Array.from(el.childNodes)) {
+    if (node.nodeType !== 3) {
+      continue
+    }
+    const text = (node.textContent || "").trim().replace(/\s+/g, " ")
+    if (!text) {
+      continue
+    }
+    try {
+      const range = doc.createRange()
+      range.selectNodeContents(node)
+      const r = range.getBoundingClientRect()
+      if (r.width > 1 && r.height > 4) {
+        boxes.push({
+          text,
+          x: Math.round(r.left - rootLeft),
+          y: Math.round(r.top - rootTop),
+          w: Math.round(r.width),
+          h: Math.round(r.height),
+        })
+      }
+    } catch {
+      /* ignore bad range */
+    }
+  }
+  return boxes
+}
+
 export function convertHtmlToSceneBlocks(
   rawHtml: string,
   options: ImportOptions,
@@ -32,11 +70,13 @@ export function convertHtmlToSceneBlocks(
     ? rawHtml
     : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`
   const measureWidth = isFullDoc ? Math.max(options.defaultWidth || 800, 1440) : options.defaultWidth || 800
+  const measureHeight = isFullDoc ? 900 : options.defaultHeight || 1200
 
   window.console.info("[html-import] input", {
     rawLen: rawHtml.length,
     isFullDoc,
     measureW: measureWidth,
+    measureH: measureHeight,
     outLen: htmlToWrite.length,
     hasStyleTag: /<style[\s>]/i.test(rawHtml),
     hasLinkTag: /<link[\s>]/i.test(rawHtml),
@@ -48,7 +88,7 @@ export function convertHtmlToSceneBlocks(
   iframe.style.left = "-9999px"
   iframe.style.top = "-9999px"
   iframe.style.width = `${measureWidth}px`
-  iframe.style.height = `${options.defaultHeight || 1200}px`
+  iframe.style.height = `${measureHeight}px`
   iframe.style.opacity = "0"
   iframe.style.pointerEvents = "none"
   iframe.style.border = "none"
@@ -335,12 +375,7 @@ export function convertHtmlToSceneBlocks(
             continue
           }
 
-          const directText = Array.from(el.childNodes)
-            .filter((n) => n.nodeType === Node.TEXT_NODE)
-            .map((n) => (n.textContent || "").trim())
-            .filter(Boolean)
-            .join(" ")
-          const hasDirectText = directText.length > 0
+          const textBoxes = directTextBoxes(el, doc, rootRect.left, rootRect.top)
 
           if (bgImg && bgImg.length > 4) {
             blocks.push({
@@ -358,17 +393,20 @@ export function convertHtmlToSceneBlocks(
               radius,
               opacity: opacityVal,
             })
-            if (hasDirectText) {
+            for (const tb of textBoxes) {
+              if (tb.text.length > 400) {
+                continue
+              }
               const fontSize = Math.round(parseFloat(style.fontSize) || 16)
               const color = parseRgbColor(style.color) || "#111111"
               blocks.push({
                 id: makeId(),
                 type: "text",
-                x: Math.max(0, x + 8),
-                y: Math.max(0, y + 8),
-                w: Math.max(40, w - 16),
-                h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 8)),
-                text: directText.slice(0, 400),
+                x: tb.x,
+                y: tb.y,
+                w: Math.max(40, tb.w),
+                h: Math.max(20, Math.min(tb.h, fontSize * 1.4 + 8)),
+                text: tb.text.slice(0, 400),
                 fontSize: Math.max(10, Math.min(96, fontSize)),
                 color,
                 bg: "transparent",
@@ -398,17 +436,20 @@ export function convertHtmlToSceneBlocks(
               radius: isCircle ? 999 : radius,
               opacity: opacityVal,
             })
-            if (hasDirectText && directText.length < 300) {
+            for (const tb of textBoxes) {
+              if (tb.text.length >= 300) {
+                continue
+              }
               const fontSize = Math.round(parseFloat(style.fontSize) || 16)
               const color = parseRgbColor(style.color) || "#111111"
               blocks.push({
                 id: makeId(),
                 type: "text",
-                x: Math.max(0, x + 8),
-                y: Math.max(0, y + Math.max(8, (h - fontSize * 1.2) / 2)),
-                w: Math.max(40, w - 16),
-                h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 4)),
-                text: directText.slice(0, 400),
+                x: tb.x,
+                y: tb.y,
+                w: Math.max(40, tb.w),
+                h: Math.max(20, Math.min(tb.h, fontSize * 1.4 + 4)),
+                text: tb.text.slice(0, 400),
                 fontSize: Math.max(10, Math.min(96, fontSize)),
                 color,
                 bg: "transparent",
@@ -420,7 +461,10 @@ export function convertHtmlToSceneBlocks(
             continue
           }
 
-          if (hasDirectText && directText.length <= 500) {
+          for (const tb of textBoxes) {
+            if (tb.text.length > 500) {
+              continue
+            }
             const styleColor = parseRgbColor(style.color) || "#111111"
             const fontSize = Math.round(parseFloat(style.fontSize) || 16)
             const isHeading = tag === "h1" || tag === "h2" || tag === "h3" || tag === "h4" || tag === "h5" || tag === "h6"
@@ -428,11 +472,11 @@ export function convertHtmlToSceneBlocks(
             blocks.push({
               id: makeId(),
               type: "text",
-              x,
-              y,
-              w: Math.max(40, w),
-              h: Math.max(18, Math.min(h, fontSize * (isHeading ? 1.25 : 1.4) + 8)),
-              text: directText.slice(0, 500),
+              x: tb.x,
+              y: tb.y,
+              w: Math.max(40, tb.w),
+              h: Math.max(18, Math.min(tb.h, fontSize * (isHeading ? 1.25 : 1.4) + 8)),
+              text: tb.text.slice(0, 500),
               fontSize: Math.max(10, Math.min(isButton ? 18 : 96, fontSize)),
               color: styleColor,
               bg: "transparent",
