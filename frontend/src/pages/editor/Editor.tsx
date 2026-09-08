@@ -52,7 +52,7 @@ function Editor() {
   }, [posterId])
 
   const persistScene = useCallback(
-    (nextDoc: SceneDoc, nextName: string) => {
+    (nextDoc: SceneDoc, nextName: string, nextW: number, nextH: number) => {
       if (!posterId) {
         return
       }
@@ -63,7 +63,7 @@ function Editor() {
       const posterNumericId = Number(posterId)
       const scenePayload = serializeScene(nextDoc)
       saveTimer.current = window.setTimeout(() => {
-        updatePoster(posterNumericId, { name: nextName, scene: scenePayload })
+        updatePoster(posterNumericId, { name: nextName, scene: scenePayload, width: nextW, height: nextH })
           .then(() => setSaveLabel(TextConfig.saved))
           .catch(() => setSaveLabel(TextConfig.saveError))
       }, 800)
@@ -73,12 +73,12 @@ function Editor() {
 
   function applyDoc(nextDoc: SceneDoc) {
     setStageDoc(nextDoc)
-    persistScene(nextDoc, posterName)
+    persistScene(nextDoc, posterName, stageWidth, stageHeight)
   }
 
   function handlePosterNameChange(nextName: string) {
     setPosterName(nextName)
-    persistScene(stageDoc, nextName)
+    persistScene(stageDoc, nextName, stageWidth, stageHeight)
   }
 
   function handleAddBlock(blockType: BlockType) {
@@ -100,7 +100,7 @@ function Editor() {
         ...prev,
         blocks: prev.blocks.map((block) => (block.id === id ? { ...block, x, y } : block)),
       }
-      persistScene(next, posterName)
+      persistScene(next, posterName, stageWidth, stageHeight)
       return next
     })
   }
@@ -148,9 +148,12 @@ function Editor() {
   }
 
   function handleApplyHtmlImport(newDoc: SceneDoc, newWidth?: number, newHeight?: number) {
+    const nextW = newWidth ?? stageWidth
+    const nextH = newHeight ?? stageHeight
     if (newWidth) setStageWidth(newWidth)
     if (newHeight) setStageHeight(newHeight)
-    applyDoc(newDoc)
+    setStageDoc(newDoc)
+    persistScene(newDoc, posterName, nextW, nextH)
   }
 
   function handleResizeBlock(id: string, x: number, y: number, w: number, h: number) {
@@ -159,7 +162,7 @@ function Editor() {
         ...prev,
         blocks: prev.blocks.map((block) => (block.id === id ? { ...block, x, y, w, h } : block)),
       }
-      persistScene(next, posterName)
+      persistScene(next, posterName, stageWidth, stageHeight)
       return next
     })
   }
@@ -170,7 +173,7 @@ function Editor() {
         ...prev,
         blocks: prev.blocks.map((block) => (block.id === id ? { ...block, radius } : block)),
       }
-      persistScene(next, posterName)
+      persistScene(next, posterName, stageWidth, stageHeight)
       return next
     })
   }

@@ -487,6 +487,25 @@ export function convertHtmlToSceneBlocks(
           }
         }
 
+        if (blocks.length > 0) {
+          let minX = blocks[0].x
+          let minY = blocks[0].y
+          for (const b of blocks) {
+            if (b.x < minX) {
+              minX = b.x
+            }
+            if (b.y < minY) {
+              minY = b.y
+            }
+          }
+          if (minX !== 0 || minY !== 0) {
+            for (const b of blocks) {
+              b.x -= minX
+              b.y -= minY
+            }
+          }
+        }
+
         let maxRight = 0
         let maxBottom = 0
         for (const b of blocks) {
