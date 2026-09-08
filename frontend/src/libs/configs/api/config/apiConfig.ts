@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: 'http://kak_to_backend:8889/api/v1/main/poster/backend/service',
+  BASE_URL: '/api/v1/main/poster/backend/service',
   HELLO_ENDPOINTS: {
     HELLO: "/",
   },
