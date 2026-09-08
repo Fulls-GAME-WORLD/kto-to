@@ -189,7 +189,7 @@ export function convertHtmlToSceneBlocks(
 
         for (const el of elements) {
           const tag = el.tagName.toLowerCase()
-          if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript" || tag === "canvas") {
+          if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript") {
             continue
           }
           if ((el as HTMLElement).dataset.figmaBg === "1") {
@@ -221,7 +221,10 @@ export function convertHtmlToSceneBlocks(
               }
             }
           }
-          const bgImg = style.backgroundImage && style.backgroundImage !== "none" ? extractImageUrl(style.backgroundImage) : ""
+          const rawBgImg = style.backgroundImage && style.backgroundImage !== "none" ? style.backgroundImage : ""
+          const isBgGradient = rawBgImg.includes("gradient")
+          const gradCss = isBgGradient ? rawBgImg : ""
+          const bgImg = !isBgGradient ? extractImageUrl(rawBgImg) : ""
           const opacityRaw = parseFloat(style.opacity || "1")
           const opacityVal = Number.isFinite(opacityRaw) ? Math.max(0, Math.min(1, opacityRaw)) : 1
 
@@ -244,6 +247,35 @@ export function convertHtmlToSceneBlocks(
           }
           radius = Math.max(0, Math.min(radius, Math.min(w, h) / 2))
 
+          if (tag === "canvas") {
+            const vw = win.innerWidth || options.defaultWidth || 800
+            const vh = win.innerHeight || options.defaultHeight || 1200
+            if (w > 4 && h > 4 && (w < vw * 0.7 || h < vh * 0.6)) {
+              try {
+                const url = (el as unknown as HTMLCanvasElement).toDataURL("image/png")
+                if (url && url.length > 200) {
+                  blocks.push({
+                    id: makeId(),
+                    type: "image",
+                    x,
+                    y,
+                    w: Math.max(20, w),
+                    h: Math.max(20, h),
+                    text: "",
+                    fontSize: 16,
+                    color: "#000000",
+                    bg: "transparent",
+                    src: url,
+                    radius,
+                    opacity: opacityVal,
+                  })
+                }
+              } catch {
+                window.console.warn("[html-import] tainted canvas skipped")
+              }
+            }
+            continue
+          }
           if (tag === "svg") {
             if (w > 4 && h > 4) {
               try {
@@ -308,7 +340,7 @@ export function convertHtmlToSceneBlocks(
             .join(" ")
           const hasDirectText = directText.length > 0
 
-          if (bgImg && bgImg.length > 4 && !bgImg.includes("gradient")) {
+          if (bgImg && bgImg.length > 4) {
             blocks.push({
               id: makeId(),
               type: "image",
@@ -360,6 +392,7 @@ export function convertHtmlToSceneBlocks(
               color: "#000000",
               bg,
               src: "",
+              bgImg: gradCss,
               radius: isCircle ? 999 : radius,
               opacity: opacityVal,
             })

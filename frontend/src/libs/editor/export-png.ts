@@ -1,4 +1,4 @@
-import type { SceneDoc } from "./scene.ts"
+import type { SceneBlock, SceneDoc } from "./scene.ts"
 
 function loadStageImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
@@ -8,6 +8,117 @@ function loadStageImage(src: string): Promise<HTMLImageElement | null> {
     image.onerror = () => resolve(null)
     image.src = src
   })
+}
+
+interface ParsedGradientStop {
+  color: string
+  pos: number
+}
+
+function splitGradientParts(inner: string): string[] {
+  const parts: string[] = []
+  let depth = 0
+  let cur = ""
+  for (const ch of inner) {
+    if (ch === "(") {
+      depth += 1
+    } else if (ch === ")") {
+      depth = Math.max(0, depth - 1)
+    }
+    if (ch === "," && depth === 0) {
+      parts.push(cur.trim())
+      cur = ""
+    } else {
+      cur += ch
+    }
+  }
+  if (cur.trim() !== "") {
+    parts.push(cur.trim())
+  }
+  return parts
+}
+
+function gradientAngleToDeg(token: string): number | null {
+  const t = token.trim().toLowerCase()
+  const deg = t.match(/^(-?[\d.]+)deg$/)
+  if (deg) {
+    return Number(deg[1])
+  }
+  if (t.startsWith("to ")) {
+    let dx = 0
+    let dy = 0
+    for (const d of t.slice(3).trim().split(/\s+/)) {
+      if (d === "right") {
+        dx += 1
+      } else if (d === "left") {
+        dx -= 1
+      } else if (d === "bottom") {
+        dy += 1
+      } else if (d === "top") {
+        dy -= 1
+      }
+    }
+    if (dx === 0 && dy === 0) {
+      return null
+    }
+    return (Math.atan2(dx, -dy) * 180) / Math.PI
+  }
+  return null
+}
+
+function parseLinearGradient(bgImg: string): { angle: number; stops: ParsedGradientStop[] } | null {
+  const key = "linear-gradient("
+  const idx = bgImg.indexOf(key)
+  if (idx < 0) {
+    return null
+  }
+  const inner = bgImg.slice(idx + key.length, bgImg.lastIndexOf(")"))
+  const parts = splitGradientParts(inner)
+  if (parts.length < 2) {
+    return null
+  }
+  let angle = 180
+  let rest = parts
+  const maybeAngle = gradientAngleToDeg(parts[0])
+  if (maybeAngle !== null) {
+    angle = maybeAngle
+    rest = parts.slice(1)
+  }
+  const stops: ParsedGradientStop[] = []
+  rest.forEach((part, i) => {
+    const m = part.match(/^(.*?)\s+(-?[\d.]+%|-?[\d.]+px)$/)
+    if (m) {
+      const fallback = rest.length > 1 ? i / (rest.length - 1) : 0
+      const pos = m[2].endsWith("%") ? Number(m[2].slice(0, -1)) / 100 : fallback
+      stops.push({ color: m[1].trim(), pos: Math.max(0, Math.min(1, pos)) })
+    } else {
+      stops.push({ color: part, pos: rest.length > 1 ? i / (rest.length - 1) : 0 })
+    }
+  })
+  if (stops.length === 0) {
+    return null
+  }
+  return { angle, stops }
+}
+
+function blockFillStyle(ctx: CanvasRenderingContext2D, block: SceneBlock): string | CanvasGradient {
+  if (block.bgImg && block.bgImg.includes("linear-gradient")) {
+    const parsed = parseLinearGradient(block.bgImg)
+    if (parsed && parsed.stops.length > 0) {
+      const rad = (parsed.angle * Math.PI) / 180
+      const dx = Math.sin(rad)
+      const dy = -Math.cos(rad)
+      const len = Math.abs(block.w * dx) + Math.abs(block.h * dy)
+      const cx = block.x + block.w / 2
+      const cy = block.y + block.h / 2
+      const grad = ctx.createLinearGradient(cx - (dx * len) / 2, cy - (dy * len) / 2, cx + (dx * len) / 2, cy + (dy * len) / 2)
+      for (const s of parsed.stops) {
+        grad.addColorStop(Math.max(0, Math.min(1, s.pos)), s.color)
+      }
+      return grad
+    }
+  }
+  return block.bg
 }
 
 export async function exportSceneToPng(doc: SceneDoc, width: number, height: number, fileName: string): Promise<void> {
@@ -28,7 +139,7 @@ export async function exportSceneToPng(doc: SceneDoc, width: number, height: num
     ctx.save()
     ctx.globalAlpha = Math.max(0, Math.min(1, opacity))
     if (block.type === "rect") {
-      ctx.fillStyle = block.bg
+      ctx.fillStyle = blockFillStyle(ctx, block)
       const r = Math.max(0, Math.min(radius, block.w / 2, block.h / 2))
       if (r > 0) {
         if (typeof (ctx as unknown as { roundRect?: unknown }).roundRect === "function") {
@@ -54,7 +165,7 @@ export async function exportSceneToPng(doc: SceneDoc, width: number, height: num
       }
     }
     if (block.type === "circle") {
-      ctx.fillStyle = block.bg
+      ctx.fillStyle = blockFillStyle(ctx, block)
       ctx.beginPath()
       ctx.ellipse(block.x + block.w / 2, block.y + block.h / 2, block.w / 2, block.h / 2, 0, 0, Math.PI * 2)
       ctx.fill()

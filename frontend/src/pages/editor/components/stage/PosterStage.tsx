@@ -148,8 +148,8 @@ function PosterStage({ stageDoc, stageWidth, stageHeight, selectedBlockId, onSel
             {block.type === "text" && (
               <span style={{ color: block.color, fontSize: block.fontSize }}>{block.text}</span>
             )}
-            {block.type === "rect" && <div className="stage-rect" style={{ background: block.bg, borderRadius: radiusStyle }} />}
-            {block.type === "circle" && <div className="stage-circle" style={{ background: block.bg }} />}
+            {block.type === "rect" && <div className="stage-rect" style={{ background: block.bgImg || block.bg, borderRadius: radiusStyle }} />}
+            {block.type === "circle" && <div className="stage-circle" style={{ background: block.bgImg || block.bg }} />}
             {block.type === "image" && block.src !== "" && <img src={block.src} alt="" draggable={false} style={{ borderRadius: canRadius ? radiusStyle : undefined }} />}
 
             {isSelected && (

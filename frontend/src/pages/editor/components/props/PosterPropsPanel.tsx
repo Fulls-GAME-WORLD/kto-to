@@ -55,7 +55,7 @@ function PosterPropsPanel({ stageDoc, selectedBlock, onCanvasBgChange, onBlockPa
               <input
                 type="color"
                 value={selectedBlock.bg}
-                onChange={(event) => onBlockPatch(selectedBlock.id, { bg: event.target.value })}
+                onChange={(event) => onBlockPatch(selectedBlock.id, { bg: event.target.value, bgImg: "" })}
               />
             </label>
           )}

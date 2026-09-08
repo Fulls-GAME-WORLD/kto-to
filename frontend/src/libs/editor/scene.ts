@@ -12,6 +12,7 @@ export interface SceneBlock {
   color: string
   bg: string
   src: string
+  bgImg?: string
   radius: number
   opacity: number
 }
@@ -49,6 +50,7 @@ export function parseScene(raw: string): SceneDoc {
           color: typeof b.color === "string" ? b.color : "#111111",
           bg: typeof b.bg === "string" ? b.bg : "#ffdd00",
           src: typeof b.src === "string" ? b.src : "",
+          bgImg: typeof (b as SceneBlock).bgImg === "string" ? (b as SceneBlock).bgImg : "",
           radius: typeof (b as SceneBlock).radius === "number" ? (b as SceneBlock).radius : 0,
           opacity: typeof (b as SceneBlock).opacity === "number" ? (b as SceneBlock).opacity : 1,
         })),
@@ -67,7 +69,7 @@ export function makeId(): string {
 }
 
 export function makeBlock(type: BlockType): SceneBlock {
-  const base = { id: makeId(), x: 60, y: 60, w: 300, h: 120, text: "", fontSize: 48, color: "#111111", bg: "#ffdd00", src: "", radius: 0, opacity: 1 }
+  const base = { id: makeId(), x: 60, y: 60, w: 300, h: 120, text: "", fontSize: 48, color: "#111111", bg: "#ffdd00", src: "", bgImg: "", radius: 0, opacity: 1 }
   if (type === "text") {
     return { ...base, type, text: "New text", h: 80, radius: 8 }
   }
