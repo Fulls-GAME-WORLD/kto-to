@@ -27,10 +27,11 @@ services:
     depends_on:
       - db
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8889/api/v1/main/poster/backend/service || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8889/api/v1/main/poster/backend/service/ || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 5
+
     networks:
       - kak_to_net
 
