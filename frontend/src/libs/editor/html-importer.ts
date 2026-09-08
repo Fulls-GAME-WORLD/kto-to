@@ -35,24 +35,27 @@ export async function convertHtmlToSceneBlocks(
 
   return new Promise((resolve) => {
     iframe.onload = () => {
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow?.document
-        if (!doc) {
-          throw new Error("Unable to access iframe document")
-        }
-
-        const container = doc.body
-        const rootRect = container.getBoundingClientRect()
-        const blocks: SceneBlock[] = []
-        let canvasBg = currentDoc.bg
-
-        const bodyStyle = iframe.contentWindow?.getComputedStyle(container)
-        if (bodyStyle) {
-          const bodyBg = parseRgbColor(bodyStyle.backgroundColor)
-          if (bodyBg && options.replaceCanvas) {
-            canvasBg = bodyBg
+      const win = iframe.contentWindow
+      const run = () => {
+        try {
+          const doc = iframe.contentDocument || win?.document
+          if (!doc) {
+            throw new Error("Unable to access iframe document")
           }
-        }
+
+          const container = doc.body
+          const rootRect = container.getBoundingClientRect()
+          const blocks: SceneBlock[] = []
+          let canvasBg = currentDoc.bg
+
+          if (win) {
+            const bodyBg = parseRgbColor(win.getComputedStyle(container).backgroundColor)
+            const htmlBg = parseRgbColor(win.getComputedStyle(win.document.documentElement).backgroundColor)
+            const detectedBg = bodyBg || htmlBg
+            if (detectedBg) {
+              canvasBg = detectedBg
+            }
+          }
 
         const elements = Array.from(container.querySelectorAll<HTMLElement>("*"))
 
@@ -298,6 +301,12 @@ export async function convertHtmlToSceneBlocks(
           doc: currentDoc,
           importedCount: 0,
         })
+      }
+      }
+      if (win) {
+        win.requestAnimationFrame(() => win.requestAnimationFrame(() => setTimeout(run, 30)))
+      } else {
+        setTimeout(run, 30)
       }
     }
 
