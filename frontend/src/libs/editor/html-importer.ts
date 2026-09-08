@@ -28,10 +28,9 @@ export function convertHtmlToSceneBlocks(
     /<head[\s>]/i.test(trimmed) ||
     /<body[\s>]/i.test(trimmed)
 
-  const noScript = rawHtml.replace(/<script[\s\S]*?<\/script\s*>/gi, "")
   const htmlToWrite = isFullDoc
-    ? noScript
-    : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${noScript}</body></html>`
+    ? rawHtml
+    : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`
 
   const iframe = document.createElement("iframe")
   iframe.style.position = "fixed"
@@ -81,7 +80,51 @@ export function convertHtmlToSceneBlocks(
 
         const bodyBg = parseRgbColor(win.getComputedStyle(container).backgroundColor)
         const htmlBg = parseRgbColor(win.getComputedStyle(win.document.documentElement).backgroundColor)
-        const detectedBg = bodyBg || htmlBg
+        let detectedBg = bodyBg || htmlBg
+
+        if (!detectedBg) {
+          const vw = win.innerWidth || options.defaultWidth || 800
+          const vh = win.innerHeight || options.defaultHeight || 1200
+          let bestBg = ""
+          let bestArea = 0
+          let bestEl: HTMLElement | null = null
+          let bestGradient = ""
+          const candidates = Array.from(container.querySelectorAll<HTMLElement>("*"))
+          for (const cand of candidates) {
+            const tag = cand.tagName.toLowerCase()
+            if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript" || tag === "svg" || tag === "canvas" || tag === "img") {
+              continue
+            }
+            const r = cand.getBoundingClientRect()
+            if (r.width >= vw * 0.7 && r.height >= vh * 0.6) {
+              const cs = win.getComputedStyle(cand)
+              const solid = parseRgbColor(cs.backgroundColor)
+              if (solid && solid !== "transparent") {
+                const area = r.width * r.height
+                if (area > bestArea) {
+                  bestArea = area
+                  bestBg = solid
+                  bestEl = cand
+                }
+              } else if (!bestBg && cs.backgroundImage && cs.backgroundImage.includes("gradient")) {
+                const m = cs.backgroundImage.match(/(rgba?\([^)]+\)|#[0-9a-fA-F]{3,8})/)
+                if (m) {
+                  const g = parseRgbColor(m[1])
+                  if (g) {
+                    bestGradient = g
+                  }
+                }
+              }
+            }
+          }
+          if (bestBg && bestEl) {
+            detectedBg = bestBg
+            ;(bestEl as HTMLElement).dataset.figmaBg = "1"
+          } else if (bestGradient) {
+            detectedBg = bestGradient
+          }
+        }
+
         if (detectedBg) {
           canvasBg = detectedBg
         }
@@ -91,6 +134,9 @@ export function convertHtmlToSceneBlocks(
         for (const el of elements) {
           const tag = el.tagName.toLowerCase()
           if (tag === "script" || tag === "style" || tag === "meta" || tag === "link" || tag === "noscript" || tag === "svg" || tag === "canvas") {
+            continue
+          }
+          if ((el as HTMLElement).dataset.figmaBg === "1") {
             continue
           }
 
@@ -287,21 +333,52 @@ export function convertHtmlToSceneBlocks(
 
     iframe.onload = () => {
       const win = iframe.contentWindow
-      if (win) {
-        win.requestAnimationFrame(() => {
+      const afterFonts = () => {
+        if (win) {
           win.requestAnimationFrame(() => {
-            window.setTimeout(measure, 150)
+            win.requestAnimationFrame(() => {
+              window.setTimeout(measure, 400)
+            })
           })
-        })
-      } else {
-        window.setTimeout(measure, 150)
+        } else {
+          window.setTimeout(measure, 400)
+        }
+      }
+      try {
+        const fonts = (win?.document as Document | undefined)?.fonts
+        if (fonts && typeof fonts.ready?.then === "function") {
+          let done = false
+          fonts.ready.then(() => {
+            if (!done) {
+              done = true
+              afterFonts()
+            }
+          }).catch(() => {
+            if (!done) {
+              done = true
+              afterFonts()
+            }
+          })
+          window.setTimeout(() => {
+            if (!done) {
+              done = true
+              afterFonts()
+            }
+          }, 1500)
+        } else {
+          afterFonts()
+        }
+      } catch {
+        afterFonts()
       }
     }
 
     document.body.appendChild(iframe)
     iframe.srcdoc = htmlToWrite
     window.setTimeout(() => {
-      finish({ doc: currentDoc, importedCount: 0 })
-    }, 8000)
+      if (!settled) {
+        measure()
+      }
+    }, 4000)
   })
 }
