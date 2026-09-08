@@ -129,6 +129,13 @@ export function convertHtmlToSceneBlocks(
           canvasBg = detectedBg
         }
 
+        window.console.info("[html-import]", {
+          bodyBg,
+          htmlBg,
+          canvasBg,
+          blocks: blocks.length,
+        })
+
         const elements = Array.from(container.querySelectorAll<HTMLElement>("*"))
 
         for (const el of elements) {
