@@ -31,10 +31,12 @@ export function convertHtmlToSceneBlocks(
   const htmlToWrite = isFullDoc
     ? rawHtml
     : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`
+  const measureWidth = isFullDoc ? Math.max(options.defaultWidth || 800, 1440) : options.defaultWidth || 800
 
   window.console.info("[html-import] input", {
     rawLen: rawHtml.length,
     isFullDoc,
+    measureW: measureWidth,
     outLen: htmlToWrite.length,
     hasStyleTag: /<style[\s>]/i.test(rawHtml),
     hasLinkTag: /<link[\s>]/i.test(rawHtml),
@@ -45,7 +47,7 @@ export function convertHtmlToSceneBlocks(
   iframe.style.position = "fixed"
   iframe.style.left = "-9999px"
   iframe.style.top = "-9999px"
-  iframe.style.width = `${options.defaultWidth || 800}px`
+  iframe.style.width = `${measureWidth}px`
   iframe.style.height = `${options.defaultHeight || 1200}px`
   iframe.style.opacity = "0"
   iframe.style.pointerEvents = "none"
