@@ -104,6 +104,18 @@ export function convertHtmlToSceneBlocks(
         let detectedBg = bodyBg || htmlBg
 
         if (!detectedBg) {
+          const bodyImg = bodyCs.backgroundImage || ""
+          const htmlImg = htmlCs.backgroundImage || ""
+          const gradSrc = bodyImg.includes("gradient") ? bodyImg : htmlImg.includes("gradient") ? htmlImg : ""
+          if (gradSrc) {
+            const gm = gradSrc.match(/(rgba?\([^)]+\)|#[0-9a-fA-F]{3,8})/)
+            if (gm) {
+              detectedBg = parseRgbColor(gm[1])
+            }
+          }
+        }
+
+        if (!detectedBg) {
           const vw = win.innerWidth || options.defaultWidth || 800
           const vh = win.innerHeight || options.defaultHeight || 1200
           let bestBg = ""
@@ -199,7 +211,16 @@ export function convertHtmlToSceneBlocks(
             continue
           }
 
-          const bg = parseRgbColor(style.backgroundColor)
+          let bg = parseRgbColor(style.backgroundColor)
+          if ((!bg || bg === "transparent") && style.backgroundImage && style.backgroundImage.includes("gradient")) {
+            const gm = style.backgroundImage.match(/(rgba?\([^)]+\)|#[0-9a-fA-F]{3,8})/)
+            if (gm) {
+              const g = parseRgbColor(gm[1])
+              if (g) {
+                bg = g
+              }
+            }
+          }
           const bgImg = style.backgroundImage && style.backgroundImage !== "none" ? extractImageUrl(style.backgroundImage) : ""
           const opacityRaw = parseFloat(style.opacity || "1")
           const opacityVal = Number.isFinite(opacityRaw) ? Math.max(0, Math.min(1, opacityRaw)) : 1
