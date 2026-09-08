@@ -86,6 +86,8 @@ function TextConfig() {
         importBtn: langDict.importBtn,
         components: langDict.components,
         canvasHint: langDict.canvasHint,
+        radius: langDict.radius,
+        opacity: langDict.opacity,
     }
 }
 export default TextConfig()

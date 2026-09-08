@@ -917,3 +917,87 @@
     }
 }
 
+.stage-block {
+    transition: outline 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out), opacity 0.15s var(--ease-out), transform 0.15s var(--ease-out);
+}
+
+.stage-block:hover {
+    outline: 1px dashed rgba(41, 182, 246, 0.5);
+    outline-offset: 0;
+}
+
+.resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border: 1px solid #1a1a1a;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    transition: transform 0.12s var(--ease-out), background 0.12s var(--ease-out), box-shadow 0.12s var(--ease-out), border-color 0.12s;
+    z-index: 5;
+}
+
+.resize-handle:hover {
+    transform: scale(1.25);
+    background: var(--accent-color);
+    border-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(41, 182, 246, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+}
+
+.resize-handle:active {
+    transform: scale(1.35);
+}
+
+.handle-nw { left: -5px; top: -5px; cursor: nw-resize; }
+.handle-n { left: 50%; top: -5px; margin-left: -5px; cursor: n-resize; }
+.handle-ne { right: -5px; top: -5px; cursor: ne-resize; }
+.handle-e { right: -5px; top: 50%; margin-top: -5px; cursor: e-resize; }
+.handle-se { right: -5px; bottom: -5px; cursor: se-resize; }
+.handle-s { left: 50%; bottom: -5px; margin-left: -5px; cursor: s-resize; }
+.handle-sw { left: -5px; bottom: -5px; cursor: sw-resize; }
+.handle-w { left: -5px; top: 50%; margin-top: -5px; cursor: w-resize; }
+
+.radius-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: var(--accent-color);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(41, 182, 246, 0.18);
+    right: 10px;
+    top: 10px;
+    cursor: ew-resize;
+    transition: transform 0.12s var(--ease-out), box-shadow 0.12s var(--ease-out);
+    z-index: 6;
+}
+
+.radius-handle:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 12px rgba(41, 182, 246, 0.6), 0 0 0 8px rgba(41, 182, 246, 0.22);
+}
+
+.radius-handle::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: #ffffff;
+    opacity: 0.95;
+}
+
+.stage-block.selected .resize-handle,
+.stage-block.selected .radius-handle {
+    animation: handlePop 0.18s var(--ease-out);
+}
+
+@keyframes handlePop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+

@@ -78,5 +78,7 @@
     "cancelBtn": "Cancel",
     "importBtn": "Import to Canvas",
     "components": "Components",
-    "canvasHint": "Canvas"
+    "canvasHint": "Canvas",
+    "radius": "Radius",
+    "opacity": "Opacity"
 }

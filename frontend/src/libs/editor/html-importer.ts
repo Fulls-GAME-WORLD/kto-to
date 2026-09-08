@@ -43,7 +43,6 @@ export async function convertHtmlToSceneBlocks(
 
         const container = doc.body
         const rootRect = container.getBoundingClientRect()
-
         const blocks: SceneBlock[] = []
         let canvasBg = currentDoc.bg
 
@@ -59,7 +58,7 @@ export async function convertHtmlToSceneBlocks(
 
         for (const el of elements) {
           const tag = el.tagName.toLowerCase()
-          if (["script", "style", "meta", "link", "noscript", "svg"].includes(tag)) {
+          if (["script", "style", "meta", "link", "noscript"].includes(tag)) {
             continue
           }
 
@@ -74,18 +73,71 @@ export async function convertHtmlToSceneBlocks(
           const x = Math.round(rect.left - rootRect.left)
           const y = Math.round(rect.top - rootRect.top)
 
-          if (w <= 0 || h <= 0) {
+          if (w <= 2 || h <= 2) {
             continue
           }
 
           const bg = parseRgbColor(style.backgroundColor)
-          const bgImg = extractImageUrl(style.backgroundImage)
-          const borderRadius = parseFloat(style.borderRadius) || 0
-          const isCircle = borderRadius >= Math.min(w, h) / 2 && Math.abs(w - h) < 6
+          const bgImg = style.backgroundImage && style.backgroundImage !== "none" ? extractImageUrl(style.backgroundImage) : ""
+          const opacity = parseFloat(style.opacity || "1")
+          const opacityVal = Number.isFinite(opacity) ? Math.max(0, Math.min(1, opacity)) : 1
+
+          let radius = 0
+          const rawRadius = style.borderRadius || ""
+          if (rawRadius) {
+            if (rawRadius.includes("%")) {
+              const pct = parseFloat(rawRadius) || 0
+              radius = Math.round(Math.min(w, h) / 2 * (pct / 50))
+              if (pct >= 50 && Math.abs(w - h) < 8) {
+                radius = 999
+              }
+            } else {
+              radius = Math.round(parseFloat(rawRadius) || 0)
+            }
+          }
+          if (style.borderTopLeftRadius) {
+            const tr = parseFloat(style.borderTopLeftRadius) || 0
+            if (tr > radius) radius = Math.round(tr)
+          }
+          radius = Math.max(0, Math.min(radius, Math.min(w, h) / 2))
+
+          const isSvg = tag === "svg"
+          if (isSvg) {
+            continue
+          }
 
           if (tag === "img") {
             const imgEl = el as HTMLImageElement
-            if (imgEl.src) {
+            const src = imgEl.currentSrc || imgEl.src || ""
+            if (src && !src.startsWith("data:") || src) {
+              if (w > 4 && h > 4) {
+                blocks.push({
+                  id: makeId(),
+                  type: "image",
+                  x,
+                  y,
+                  w: Math.max(20, w),
+                  h: Math.max(20, h),
+                  text: "",
+                  fontSize: 16,
+                  color: "#000000",
+                  bg: "transparent",
+                  src,
+                  radius: radius > 2 ? radius : 8,
+                  opacity: opacityVal,
+                })
+              }
+            }
+            continue
+          }
+
+          const hasDirectText = Array.from(el.childNodes).some(
+            (node) => node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim().length > 0
+          )
+
+          if (bgImg && bgImg.length > 4) {
+            const isProbablyGradient = bgImg.includes("gradient")
+            if (!isProbablyGradient) {
               blocks.push({
                 id: makeId(),
                 type: "image",
@@ -97,27 +149,42 @@ export async function convertHtmlToSceneBlocks(
                 fontSize: 16,
                 color: "#000000",
                 bg: "transparent",
-                src: imgEl.src,
+                src: bgImg,
+                radius,
+                opacity: opacityVal,
               })
+              if (hasDirectText) {
+                const directText = Array.from(el.childNodes)
+                  .filter((n) => n.nodeType === Node.TEXT_NODE)
+                  .map((n) => (n.textContent || "").trim())
+                  .filter(Boolean)
+                  .join(" ")
+                if (directText) {
+                  const fontSize = Math.round(parseFloat(style.fontSize) || 16)
+                  const color = parseRgbColor(style.color) || "#111111"
+                  blocks.push({
+                    id: makeId(),
+                    type: "text",
+                    x: Math.max(0, x + 8),
+                    y: Math.max(0, y + 8),
+                    w: Math.max(40, w - 16),
+                    h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 8)),
+                    text: directText.slice(0, 400),
+                    fontSize: Math.max(10, Math.min(96, fontSize)),
+                    color,
+                    bg: "transparent",
+                    src: "",
+                    radius: 0,
+                    opacity: opacityVal,
+                  })
+                }
+              }
+              continue
             }
-            continue
           }
 
-          if (bgImg && !bgImg.startsWith("none")) {
-            blocks.push({
-              id: makeId(),
-              type: "image",
-              x,
-              y,
-              w: Math.max(20, w),
-              h: Math.max(20, h),
-              text: "",
-              fontSize: 16,
-              color: "#000000",
-              bg: "transparent",
-              src: bgImg,
-            })
-          } else if (bg && bg !== "transparent") {
+          if (bg && bg !== "transparent") {
+            const isCircle = radius >= Math.min(w, h) / 2 - 2 && Math.abs(w - h) < 8
             blocks.push({
               id: makeId(),
               type: isCircle ? "circle" : "rect",
@@ -130,35 +197,74 @@ export async function convertHtmlToSceneBlocks(
               color: "#000000",
               bg,
               src: "",
+              radius: isCircle ? 999 : radius,
+              opacity: opacityVal,
             })
+            if (hasDirectText) {
+              const directText = Array.from(el.childNodes)
+                .filter((n) => n.nodeType === Node.TEXT_NODE)
+                .map((n) => (n.textContent || "").trim())
+                .filter(Boolean)
+                .join(" ")
+              if (directText) {
+                const fontSize = Math.round(parseFloat(style.fontSize) || 16)
+                const color = parseRgbColor(style.color) || "#111111"
+                const hasBg = true
+                if (hasBg && directText.length < 300) {
+                  blocks.push({
+                    id: makeId(),
+                    type: "text",
+                    x: Math.max(0, x + 8),
+                    y: Math.max(0, y + Math.max(8, (h - fontSize * 1.2) / 2)),
+                    w: Math.max(40, w - 16),
+                    h: Math.max(20, Math.min(h - 16, fontSize * 1.4 + 4)),
+                    text: directText.slice(0, 400),
+                    fontSize: Math.max(10, Math.min(96, fontSize)),
+                    color,
+                    bg: "transparent",
+                    src: "",
+                    radius: 0,
+                    opacity: opacityVal,
+                  })
+                }
+              }
+            }
+            continue
           }
 
-          const hasDirectText = Array.from(el.childNodes).some(
-            (node) => node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim().length > 0
-          )
-          const isTextContainer =
-            ["h1", "h2", "h3", "h4", "h5", "h6", "p", "span", "a", "button", "label", "b", "strong", "em", "i", "small", "li"].includes(tag) ||
-            hasDirectText
+          if (hasDirectText) {
+            const directText = Array.from(el.childNodes)
+              .filter((n) => n.nodeType === Node.TEXT_NODE)
+              .map((n) => (n.textContent || "").trim())
+              .filter(Boolean)
+              .join(" ")
 
-          if (isTextContainer && el.children.length === 0) {
-            const textContent = (el.textContent || "").trim()
-            if (textContent.length > 0) {
-              const fontSize = Math.round(parseFloat(style.fontSize) || 16)
-              const color = parseRgbColor(style.color) || "#111111"
+            if (directText && directText.length > 0) {
+              const styleColor = parseRgbColor(style.color) || "#111111"
+              const rawSize = parseFloat(style.fontSize) || 16
+              const fontSize = Math.round(rawSize)
+              const isHeading = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(tag)
+              const isButton = tag === "button" || tag === "a"
+              const effectiveH = Math.max(18, Math.min(h, fontSize * (isHeading ? 1.25 : 1.4) + 8))
+              const effectiveW = Math.max(40, w)
 
-              blocks.push({
-                id: makeId(),
-                type: "text",
-                x,
-                y,
-                w: Math.max(40, w),
-                h: Math.max(24, h),
-                text: textContent,
-                fontSize: Math.max(12, fontSize),
-                color,
-                bg: "transparent",
-                src: "",
-              })
+              if (directText.length <= 500) {
+                blocks.push({
+                  id: makeId(),
+                  type: "text",
+                  x,
+                  y,
+                  w: effectiveW,
+                  h: effectiveH,
+                  text: directText.slice(0, 500),
+                  fontSize: Math.max(10, Math.min(isButton ? 18 : 96, fontSize)),
+                  color: styleColor,
+                  bg: "transparent",
+                  src: "",
+                  radius: 0,
+                  opacity: opacityVal,
+                })
+              }
             }
           }
         }
@@ -180,8 +286,8 @@ export async function convertHtmlToSceneBlocks(
 
         resolve({
           doc: newDoc,
-          width: options.resizeCanvasToFit && maxRight > 100 ? Math.max(maxRight + 40, 400) : undefined,
-          height: options.resizeCanvasToFit && maxBottom > 100 ? Math.max(maxBottom + 40, 400) : undefined,
+          width: options.resizeCanvasToFit && maxRight > 100 ? Math.max(maxRight + 32, 400) : undefined,
+          height: options.resizeCanvasToFit && maxBottom > 100 ? Math.max(maxBottom + 32, 400) : undefined,
           importedCount: blocks.length,
         })
       } catch {
@@ -205,7 +311,8 @@ export async function convertHtmlToSceneBlocks(
             <meta charset="utf-8">
             <style>
               * { box-sizing: border-box; }
-              body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+              body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: ${currentDoc.bg}; }
+              img { max-width: 100%; height: auto; }
             </style>
           </head>
           <body>

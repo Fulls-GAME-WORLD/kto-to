@@ -78,5 +78,7 @@
     "cancelBtn": "Отмена",
     "importBtn": "Импортировать в холст",
     "components": "Компоненты",
-    "canvasHint": "Холст"
+    "canvasHint": "Холст",
+    "radius": "Скругление",
+    "opacity": "Прозрачность"
 }

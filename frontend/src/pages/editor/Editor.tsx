@@ -153,6 +153,28 @@ function Editor() {
     applyDoc(newDoc)
   }
 
+  function handleResizeBlock(id: string, x: number, y: number, w: number, h: number) {
+    setStageDoc((prev) => {
+      const next: SceneDoc = {
+        ...prev,
+        blocks: prev.blocks.map((block) => (block.id === id ? { ...block, x, y, w, h } : block)),
+      }
+      persistScene(next, posterName)
+      return next
+    })
+  }
+
+  function handleRadiusChange(id: string, radius: number) {
+    setStageDoc((prev) => {
+      const next: SceneDoc = {
+        ...prev,
+        blocks: prev.blocks.map((block) => (block.id === id ? { ...block, radius } : block)),
+      }
+      persistScene(next, posterName)
+      return next
+    })
+  }
+
   const selectedBlock = stageDoc.blocks.find((block) => block.id === selectedBlockId) ?? null
 
   return (
@@ -219,6 +241,8 @@ function Editor() {
                     selectedBlockId={selectedBlockId}
                     onSelectBlock={setSelectedBlockId}
                     onMoveBlock={handleMoveBlock}
+                    onResizeBlock={handleResizeBlock}
+                    onRadiusChange={handleRadiusChange}
                   />
                 </div>
                 <span className="figma-canvas-hint">

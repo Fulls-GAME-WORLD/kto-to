@@ -75,6 +75,29 @@ function PosterPropsPanel({ stageDoc, selectedBlock, onCanvasBgChange, onBlockPa
               onChange={(event) => onBlockPatch(selectedBlock.id, { h: Number(event.target.value) })}
             />
           </label>
+          {(selectedBlock.type === "rect" || selectedBlock.type === "image") && (
+            <label>
+              {TextConfig.radius}
+              <input
+                type="number"
+                min={0}
+                max={Math.min(selectedBlock.w, selectedBlock.h) / 2}
+                value={Math.round(selectedBlock.radius || 0)}
+                onChange={(event) => onBlockPatch(selectedBlock.id, { radius: Math.max(0, Number(event.target.value)) })}
+              />
+            </label>
+          )}
+          <label>
+            {TextConfig.opacity}
+            <input
+              type="number"
+              min={0}
+              max={1}
+              step={0.05}
+              value={selectedBlock.opacity ?? 1}
+              onChange={(event) => onBlockPatch(selectedBlock.id, { opacity: Math.max(0, Math.min(1, Number(event.target.value))) })}
+            />
+          </label>
         </>
       )}
     </aside>
