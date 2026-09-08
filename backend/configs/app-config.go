@@ -11,6 +11,6 @@ func GetJWTSecret() string {
 }
 
 func GetDBUrl() string {
-	DB_URL := "postgres://postgres:postgres@localhost:19930/kak_to?sslmode=disable"
+	DB_URL := "postgres://postgres:postgres@kak_to_db:5432/kak_to?sslmode=disable"
 	return DB_URL
 }

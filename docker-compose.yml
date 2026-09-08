@@ -6,10 +6,46 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: kak_to
-    ports:
-      - "19930:5432"
+    expose:
+      - "5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - kak_to_net
+
+  backend:
+    build: ./backend
+    container_name: kak_to_backend
+    expose:
+      - "8889"
+    depends_on:
+      - db
+    networks:
+      - kak_to_net
+
+  frontend:
+    build: ./frontend
+    container_name: kak_to_frontend
+    expose:
+      - "4173"
+    depends_on:
+      - backend
+    networks:
+      - kak_to_net
+
+  nginx:
+    build:
+      context: ./nginx/configs
+      dockerfile: Dockerfile
+    container_name: kak_to_nginx
+    ports:
+      - "12489:12489"
+    networks:
+      - kak_to_net
 
 volumes:
   db-data:
+
+networks:
+  kak_to_net:
+    driver: bridge
