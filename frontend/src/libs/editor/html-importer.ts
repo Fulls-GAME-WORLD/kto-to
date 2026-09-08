@@ -314,9 +314,7 @@ export async function convertHtmlToSceneBlocks(
     if (doc) {
       const trimmed = rawHtml.trim()
       const isFullDoc = /^<!doctype/i.test(trimmed) || /<html[\s>]/i.test(trimmed) || /<head[\s>]/i.test(trimmed) || /<body[\s>]/i.test(trimmed)
-      const htmlToWrite = isFullDoc
-        ? rawHtml
-        : `<!DOCTYPE html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0}img{max-width:100%;height:auto}</style></head><body>${rawHtml}</body></html>`
+      const htmlToWrite = isFullDoc ? rawHtml : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`
       doc.open()
       doc.write(htmlToWrite)
       doc.close()
