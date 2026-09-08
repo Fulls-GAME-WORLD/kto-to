@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import MainMenu from "../../components/menu/MainMenu.tsx"
 import { getPoster, updatePoster } from "../../libs/posters/posters.ts"
 import { resolveAssetUrl, uploadAsset } from "../../libs/assets/assets.ts"
 import { emptyScene, makeBlock, parseScene, serializeScene, type BlockType, type SceneBlock, type SceneDoc,} from "../../libs/editor/scene.ts"
@@ -158,61 +157,86 @@ function Editor() {
 
   return (
     <>
-      <MainMenu />
-      <main className="main-pages editor-page">
-        <div className="pages">
-          {loading && <EditorLoadingState />}
-          {!loading && error !== "" && <EditorErrorAlert message={error} />}
-          {!loading && error === "" && (
-            <div className="editor-shell">
-              <PosterTopbar
-                posterName={posterName}
-                posterFormat={posterFormat}
-                saveLabel={saveLabel}
-                onPosterNameChange={handlePosterNameChange}
-              />
-              <PosterToolbar
-                onAddTextBlock={() => handleAddBlock("text")}
-                onAddRectBlock={() => handleAddBlock("rect")}
-                onAddCircleBlock={() => handleAddBlock("circle")}
-                onUploadImageFile={(file) => void handleUploadImageFile(file)}
-                onOpenHtmlImport={() => setIsImportModalOpen(true)}
-                onPrintPoster={handlePrintPoster}
-                onExportPosterPng={handleExportPosterPng}
-              />
-              <div className="editor-main">
-                <div className="editor-canvas-wrap">
-                <PosterStage
-                  stageDoc={stageDoc}
-                  stageWidth={stageWidth}
-                  stageHeight={stageHeight}
-                  selectedBlockId={selectedBlockId}
-                  onSelectBlock={setSelectedBlockId}
-                  onMoveBlock={handleMoveBlock}
-                />
+      <main className="main-pages editor-page editor-figma">
+        {loading && (
+          <div className="figma-center">
+            <EditorLoadingState />
+          </div>
+        )}
+        {!loading && error !== "" && (
+          <div className="figma-center">
+            <EditorErrorAlert message={error} />
+          </div>
+        )}
+        {!loading && error === "" && (
+          <div className="editor-shell figma-shell">
+            <PosterTopbar
+              posterName={posterName}
+              posterFormat={posterFormat}
+              saveLabel={saveLabel}
+              onPosterNameChange={handlePosterNameChange}
+            />
+            <div className="editor-figma-body">
+              <aside className="figma-left">
+                <details open className="figma-disclosure">
+                  <summary className="figma-disclosure-head">
+                    {TextConfig.components}
+                  </summary>
+                  <div className="figma-disclosure-body">
+                    <PosterToolbar
+                      onAddTextBlock={() => handleAddBlock("text")}
+                      onAddRectBlock={() => handleAddBlock("rect")}
+                      onAddCircleBlock={() => handleAddBlock("circle")}
+                      onUploadImageFile={(file) => void handleUploadImageFile(file)}
+                      onOpenHtmlImport={() => setIsImportModalOpen(true)}
+                      onPrintPoster={handlePrintPoster}
+                      onExportPosterPng={handleExportPosterPng}
+                    />
+                  </div>
+                </details>
+                <details open className="figma-disclosure">
+                  <summary className="figma-disclosure-head">
+                    {TextConfig.layers}
+                  </summary>
+                  <div className="figma-disclosure-body">
+                    <PosterLayersPanel
+                      stageBlocks={stageDoc.blocks}
+                      selectedBlockId={selectedBlockId}
+                      onSelectBlock={setSelectedBlockId}
+                      onMoveBlockUp={handleMoveBlockUp}
+                      onMoveBlockDown={handleMoveBlockDown}
+                      onDeleteBlock={handleDeleteBlock}
+                    />
+                  </div>
+                </details>
+              </aside>
+              <div className="figma-canvas">
+                <div className="figma-canvas-inner">
+                  <PosterStage
+                    stageDoc={stageDoc}
+                    stageWidth={stageWidth}
+                    stageHeight={stageHeight}
+                    selectedBlockId={selectedBlockId}
+                    onSelectBlock={setSelectedBlockId}
+                    onMoveBlock={handleMoveBlock}
+                  />
+                </div>
+                <span className="figma-canvas-hint">
+                  {TextConfig.canvasHint} {stageWidth}×{stageHeight}
+                </span>
               </div>
-              <div className="editor-side">
+              <aside className="figma-right">
                 <PosterPropsPanel
                   stageDoc={stageDoc}
                   selectedBlock={selectedBlock}
                   onCanvasBgChange={(bg) => applyDoc({ ...stageDoc, bg })}
                   onBlockPatch={handleBlockPatch}
                 />
-                <PosterLayersPanel
-                  stageBlocks={stageDoc.blocks}
-                  selectedBlockId={selectedBlockId}
-                  onSelectBlock={setSelectedBlockId}
-                  onMoveBlockUp={handleMoveBlockUp}
-                  onMoveBlockDown={handleMoveBlockDown}
-                  onDeleteBlock={handleDeleteBlock}
-                />
-              </div>
+              </aside>
             </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </main>
-
       <HtmlImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}

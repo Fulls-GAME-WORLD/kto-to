@@ -76,5 +76,7 @@
     "importReplaceBlocks": "Replace existing blocks on canvas",
     "importResizeCanvas": "Resize canvas to fit imported layout",
     "cancelBtn": "Cancel",
-    "importBtn": "Import to Canvas"
+    "importBtn": "Import to Canvas",
+    "components": "Components",
+    "canvasHint": "Canvas"
 }

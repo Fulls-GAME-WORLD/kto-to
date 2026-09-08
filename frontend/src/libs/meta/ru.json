@@ -76,5 +76,7 @@
     "importReplaceBlocks": "Заменить текущие блоки на холсте",
     "importResizeCanvas": "Подогнать размеры холста под макет",
     "cancelBtn": "Отмена",
-    "importBtn": "Импортировать в холст"
+    "importBtn": "Импортировать в холст",
+    "components": "Компоненты",
+    "canvasHint": "Холст"
 }

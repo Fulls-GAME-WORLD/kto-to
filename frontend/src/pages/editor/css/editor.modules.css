@@ -707,3 +707,214 @@
     box-shadow: none;
 }
 
+.editor-page.editor-figma {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.editor-page.editor-figma .poster-topbar {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    box-shadow: none;
+    background: #1c1d23;
+    margin: 0;
+}
+
+.main-pages.editor-page.editor-figma {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.figma-center {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    min-height: 60vh;
+}
+
+.figma-shell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    gap: 0;
+}
+
+.editor-figma-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.figma-left {
+    width: 280px;
+    min-width: 280px;
+    background: var(--form-bg);
+    border-right: 1px solid var(--form-border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.figma-disclosure {
+    background: #1c1e26;
+    border: 1px solid var(--form-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.figma-disclosure summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px 12px;
+    background: #1f2128;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.figma-disclosure summary::-webkit-details-marker {
+    display: none;
+}
+
+.figma-disclosure summary::before {
+    content: "▸";
+    font-size: 10px;
+    color: var(--text-muted);
+    display: inline-block;
+    transition: transform var(--transition);
+}
+
+.figma-disclosure[open] summary::before {
+    content: "▾";
+}
+
+.figma-disclosure[open] summary {
+    border-bottom: 1px solid var(--form-border);
+    background: #232530;
+    color: var(--text-primary);
+}
+
+.figma-disclosure-body {
+    padding: 12px;
+    background: var(--form-bg);
+}
+
+.figma-left .poster-toolbar {
+    flex-direction: column;
+    width: 100%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    gap: 8px;
+}
+
+.figma-left .poster-toolbar button {
+    width: 100%;
+    justify-content: center;
+}
+
+.figma-left .poster-layers {
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.figma-left .poster-layers h3 {
+    display: none;
+}
+
+.figma-canvas {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+    background: var(--editor-bg);
+    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+    padding: 32px 24px;
+    gap: 16px;
+}
+
+.figma-canvas-inner {
+    flex-shrink: 0;
+}
+
+.figma-canvas-hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.figma-right {
+    width: 320px;
+    min-width: 320px;
+    background: var(--form-bg);
+    border-left: 1px solid var(--form-border);
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.figma-right .poster-props {
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+@media (max-width: 980px) {
+    .figma-left {
+        position: absolute;
+        left: 0;
+        top: 52px;
+        bottom: 0;
+        z-index: 15;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .figma-right {
+        position: absolute;
+        right: 0;
+        top: 52px;
+        bottom: 0;
+        z-index: 15;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .figma-canvas {
+        padding: 20px 16px;
+    }
+}
+

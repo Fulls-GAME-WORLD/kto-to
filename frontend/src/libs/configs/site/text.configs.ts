@@ -84,6 +84,8 @@ function TextConfig() {
         importResizeCanvas: langDict.importResizeCanvas,
         cancelBtn: langDict.cancelBtn,
         importBtn: langDict.importBtn,
+        components: langDict.components,
+        canvasHint: langDict.canvasHint,
     }
 }
 export default TextConfig()
