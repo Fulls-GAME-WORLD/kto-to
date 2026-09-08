@@ -12,20 +12,32 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - kak_to_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
     container_name: kak_to_backend
+    restart: always
     expose:
       - "8889"
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8889/api/v1/main/poster/backend/service || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - kak_to_net
 
   frontend:
     build: ./frontend
     container_name: kak_to_frontend
+    restart: always
     expose:
       - "4173"
     depends_on:
@@ -38,8 +50,12 @@ services:
       context: ./nginx/configs
       dockerfile: Dockerfile
     container_name: kak_to_nginx
+    restart: always
     ports:
       - "12489:12489"
+    depends_on:
+      - backend
+      - frontend
     networks:
       - kak_to_net
 
